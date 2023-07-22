@@ -1,6 +1,5 @@
 <script setup>
 import SignUp from './SignUp.vue';
-import SignIn from './SignIn.vue';
 </script>
 
 
@@ -29,7 +28,10 @@ import SignIn from './SignIn.vue';
     <v-container class="bg-surface-variant">
         <v-row class="justify-end">
             <SignUp/>
-            <SignIn/>
+            
+            <v-btn class="ml-2" color="primary" v-bind="props" to="/login">
+                Sign In
+            </v-btn>
         </v-row>
   </v-container>
 </template>
