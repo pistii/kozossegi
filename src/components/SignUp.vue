@@ -20,10 +20,9 @@ for (let y = currentDate.getFullYear(); y > currentDate.getFullYear()-90; y--) {
 }
 </script>
 <template>
-    <v-row justify="center">
         <v-dialog v-model="dialog" persistent width="768">
             <template v-slot:activator="{ props }">
-                <v-btn color="primary" v-bind="props">
+                <v-btn class="ml-2" color="primary" v-bind="props">
                     Sign Up
                 </v-btn>
             </template>
@@ -80,7 +79,6 @@ for (let y = currentDate.getFullYear(); y > currentDate.getFullYear()-90; y--) {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-    </v-row>
 </template>
 
 <script>
