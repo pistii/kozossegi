@@ -22,7 +22,7 @@
                                 <v-icon>mdi-refresh</v-icon>
                             </v-btn>
                         </template>
-                        <span>Refresh frm</span>
+                        <span>Refresh form</span>
                     </v-tooltip>
                     <v-btn color="primary" variant="text" @click="login()">
                         Login
