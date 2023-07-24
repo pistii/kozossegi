@@ -45,7 +45,6 @@ export default {
         login() {
             var data = {email : this.email, password : this.password};
             $.postJSON('http://localhost:5000/personal', data, console.log("success"));
-            
         }
     }
 }
@@ -56,12 +55,19 @@ $.postJSON = function(url, data, callback) {
         'Accept': 'application/json',
         'Content-Type': 'application/json' 
     },
+    statusCode: {
+        500: function(xhr) {
+            console.log(xhr.responseText);
+        },
+        404: function(xhr) {
+            alert("email or password doesn't exist")
+        }
+    },
     'type': 'POST',
     'url': url,
     'data': JSON.stringify(data),
     'dataType': 'json',
-    'success': function() { alert('Success')},
-    'error' : function() { alert("Error")}
+    'success': callback
     });
 };
 </script>

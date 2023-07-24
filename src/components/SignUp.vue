@@ -93,9 +93,11 @@ export default {
         last_name : '',
         email : '',
         password : '',
+        birthday : '1234-01-01',
 
         dispMessage : '',
         showRes : false
+
         //TODO: BIRTHDAY 
     }),
     methods : {
@@ -104,8 +106,11 @@ export default {
                 firstName : this.first_name,
                 middleName : this.middle_name,
                 lastName : this.last_name,
-                avatar : "",
-                phoneNumber : null
+                avatar : '',
+                birthday : this.birthday,
+                email : this.email,
+                password : this.password,
+                registrationDate : Date.now()
             }
             if (this.first_name.length >= 3 || 
             this.last_name.length >= 3 || 
