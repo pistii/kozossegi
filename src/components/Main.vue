@@ -4,29 +4,13 @@ import SignUp from './SignUp.vue';
 
 
 <template>
-    <!-- <v-card class="mx-auto" max-width="344" variant="outlined">
-        <v-card-item>
-
-            <div>
-                <div class="text-overline mb-1">
-                    OVERLINE
-                </div>
-                <div class="text-h6 mb-1">
-                    Headline
-                </div>
-                <div class="text-caption">Greyhound divisely hello coldly fonwderfully</div>
-            </div>
-        </v-card-item>
-
-        <v-card-actions>
-            <v-btn variant="outlined">
-                Button
-            </v-btn>
-        </v-card-actions>
-    </v-card> -->
-
     <v-container class="bg-surface-variant">
         <v-row class="justify-end">
+            <v-text-field >
+                <div class="keresbtn">
+                <v-btn >Keres</v-btn>
+            </div>
+            </v-text-field>
             <SignUp/>
             
             <v-btn class="ml-2" color="primary" v-bind="props" to="/login">
@@ -35,3 +19,10 @@ import SignUp from './SignUp.vue';
         </v-row>
   </v-container>
 </template>
+
+<style>
+.keresbtn {
+    justify-content: right;
+    text-align: right;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <v-container v-if="true">
+    <v-container v-if="true" class="v-container">
         <div>
             <div><img src="src/assets/imgs/blank_profile_pic.png" style="width:200px" /></div>
             <h2>Gipsz Jakab</h2>
@@ -8,13 +8,14 @@
         <div>
             <v-row>
                 <v-col>
-                    col 1
-                </v-col>
-                <v-col>
                     <text-area-with-button />
+                    <center-content></center-content>
                 </v-col>
-                <v-col>
-                    col 3
+                <v-col cols="3" style="background-color: aqua; width:auto; height: auto" >
+                    col 2
+                    <div >
+dssd
+                    </div>
                 </v-col>
             </v-row>
         </div>
@@ -23,13 +24,14 @@
 
 <script>
 import TextAreaWithButton from '/src/components/TextAreaWithButton.vue';
-
+import CenterContent from './CenterContent.vue';
 //personal profile
 var loggedIn = true;
 
 export default {
     components: {
         'text-area-with-button': TextAreaWithButton,
+        'center-content' : CenterContent,
     },
     data() {
         return {
@@ -38,3 +40,13 @@ export default {
     },
 };
 </script>
+
+<style>
+.v-container {
+    padding-right: 1px;
+    margin-right: 1px;
+    margin-left: 50px;
+    
+    
+}
+</style>

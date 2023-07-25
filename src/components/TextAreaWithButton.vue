@@ -1,10 +1,8 @@
 <template>
-    <v-container>
         <div class="textarea-container">
             <v-textarea v-model="message" placeholder="Type your message here..." />
             <v-btn class="custom-button" @click="Comment">Send</v-btn>
         </div>
-    </v-container>
 </template>
   
 <script>
