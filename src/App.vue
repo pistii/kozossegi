@@ -9,8 +9,8 @@ import {ref, onMounted} from 'vue'
 <template>
   <header>
       <nav>
-        <RouterLink to="/">Főoldal</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/" class="v-btn"><v-btn block rounded="lg" size="x-large">Főoldal</v-btn></RouterLink>
+        <RouterLink to="/about" class="v-btn"><v-btn block rounded="lg" size="x-large">About</v-btn></RouterLink>
       </nav>
       <template>
       </template>

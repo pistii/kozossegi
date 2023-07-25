@@ -14,9 +14,9 @@
             </div>
         </v-card-item>
         <v-card-actions>
-            <Like  />
-            <Like class="dislike_svg" />
-            <Comment />
+            <Like @click="LikeComment()"/>
+            <Like class="ml-3 dislike_svg" @click="DisLikeComment()" />
+            <Comment class="ml-3" @click="ShowComments()"/>
         </v-card-actions>
 
 
@@ -26,6 +26,7 @@
 <script>
 import LikeSVG from './LikeSVG.vue';
 import Comment from './Comment.vue';
+
 export default {
     components: {
         Like: LikeSVG,
@@ -34,6 +35,17 @@ export default {
     data() {
         return {
         }
+    },
+    methods: {
+        LikeComment() {
+            console.log("liked");
+        },
+        DisLikeComment() {
+            console.log("disliked");
+        },
+        ShowComments() {
+            console.log("view comments");
+        },
     }
 }
 </script>
