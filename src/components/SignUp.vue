@@ -106,7 +106,6 @@ export default {
                 firstName : this.first_name,
                 middleName : this.middle_name,
                 lastName : this.last_name,
-                avatar : '',
                 birthday : this.birthday,
                 email : this.email,
                 password : this.password,

@@ -43,8 +43,14 @@ export default {
     }),
     methods: {
         login() {
-            var data = {email : this.email, password : this.password};
-            $.postJSON('http://localhost:5000/personal', data, console.log("success"));
+            var data = {
+                email : this.email, 
+                password : this.password,
+                firstName : "",
+                middleName : "",
+                lastName : ""    
+            };
+            $.postJSON('http://localhost:5000/users', data);
         }
     }
 }
