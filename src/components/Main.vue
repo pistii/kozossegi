@@ -1,41 +1,28 @@
-<script setup>
-import SignUp from './SignUp.vue';
+<script>
+import { RouterView } from 'vue-router'
+import SignUp from '/src/components/SignUp.vue';
+
+export default {
+    components: {
+        SignUp,
+    }
+}
 </script>
 
 
 <template>
-    <v-container class="bg-surface-variant">
-
-        <v-row class="searchbarContainer">
-            <v-text-field class="textfield1">
-
-            </v-text-field>
-            <v-btn>Keres</v-btn>
-        </v-row>
+    <v-container>
         <v-row>
-
+        <SignUp />
+        <v-btn class="ml-2" color="primary" v-bind="props" to="/login">
+            Sign In
+        </v-btn>
         </v-row>
+        <RouterView/>
     </v-container>
 
-    <SignUp />
-
-    <v-btn class="ml-2" color="primary" v-bind="props" to="/login">
-        Sign In
-    </v-btn>
 </template>
 
 <style>
-.searchbarContainer {
-    position: absolute;
-}
 
-.keresbtn {
-    justify-content: right;
-    text-align: right;
-    position: relative;
-}
-
-.textfield1 {
-    width: 100%;
-}
 </style>

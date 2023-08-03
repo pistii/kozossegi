@@ -9,7 +9,9 @@
 export default {
     data() {
         return {
-            message: ""
+            message: "",
+            
+
         };
     },
     methods: {

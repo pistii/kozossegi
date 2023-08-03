@@ -24,7 +24,7 @@ dssd
 
 <script>
 import TextAreaWithButton from '/src/components/TextAreaWithButton.vue';
-import CenterContent from './CenterContent.vue';
+import CenterContent from '/src/assets/imgs/CenterContent.vue';
 //personal profile
 var loggedIn = true;
 
@@ -46,7 +46,5 @@ export default {
     padding-right: 1px;
     margin-right: 1px;
     margin-left: 50px;
-    
-    
 }
 </style>

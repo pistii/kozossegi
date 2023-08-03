@@ -5,15 +5,16 @@
                 <v-card-text>
                     <v-text-field ref="email" v-model="email" 
                     :rules="[() => !!email || 'This field is required', //Email validation
-                    // () => !email || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email) || 'E-mail must be valid'
+                    () => !email || /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email) || 'E-mail must be valid'
                 ]"
                         :error-messages="errorMessages" label="Email address" placeholder="example123@email.com" required />
 
                     <v-text-field ref="password" v-model="password" 
                     :rules="[() => !!password || 'This field is required', //Password validation
-                    //() => password.length > 5 || 'Minimum 6 character required'
+                    () => password.length > 5 || 'Minimum 6 character required'
                     ]" label="Password" type="password" required :error-messages="errorMessages" />
                 </v-card-text>
+                <div class="loginMsg" id="errorMsg"></div>
                 <v-divider class="mt-12"></v-divider>
                 <v-card-actions>
                     <v-tooltip v-if="formHasErrors" location="left">
@@ -36,11 +37,16 @@
 
 <script>
 import $ from 'jquery';
+import router from '/src/router/index.js';
+
 export default {
     data: () => ({
         email: '',
         password: '',
     }),
+    components : {
+        navBar : navBar
+    },
     methods: {
         login() {
             var data = {
@@ -48,9 +54,10 @@ export default {
                 password : this.password,
                 firstName : "",
                 middleName : "",
-                lastName : ""    
+                lastName : "",
+                
             };
-            $.postJSON('http://localhost:5000/users', data);
+            $.postJSON('http://localhost:5000/users/true', data, "");
         }
     }
 }
@@ -61,19 +68,33 @@ $.postJSON = function(url, data, callback) {
         'Accept': 'application/json',
         'Content-Type': 'application/json' 
     },
-    statusCode: {
-        500: function(xhr) {
-            console.log(xhr.responseText);
-        },
-        404: function(xhr) {
-            alert("email or password doesn't exist")
-        }
+    success: function(data, textStatus, jqXHR){
+        console.log(textStatus + ": " + jqXHR.status);
+        router.push({ path: '/myProfile' })
+    // do something with data
+    },
+    error: function(jqXHR, textStatus, errorThrown){
+        console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+        $("#errorMsg").append("<h3>Email or password is wrong</h3>")
     },
     'type': 'POST',
     'url': url,
     'data': JSON.stringify(data),
-    'dataType': 'json',
-    'success': callback
+    'dataType': 'json'
     });
 };
+
+const chk = function(val) {
+    if (val == 500 || val == 404) {
+        alert('Error' + val);
+    } else {
+        alert("success" + val)
+    }
+}
 </script>
+
+<style>
+.loginMsg {
+    visibility : visible;
+}
+</style>

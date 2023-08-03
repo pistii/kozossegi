@@ -64,6 +64,9 @@ for (let y = currentDate.getFullYear(); y > currentDate.getFullYear()-90; y--) {
                         </v-row>
                     </v-container>
                     <small>*indicates required field</small>
+                    <v-sheet>
+                        Already have an account?<RouterLink to="login"> Log In</RouterLink>
+                    </v-sheet>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -103,10 +106,6 @@ export default {
     methods : {
         register() {
             var data = {
-                firstName : this.first_name,
-                middleName : this.middle_name,
-                lastName : this.last_name,
-                birthday : this.birthday,
                 email : this.email,
                 password : this.password,
                 registrationDate : Date.now()
@@ -114,7 +113,7 @@ export default {
             if (this.first_name.length >= 3 || 
             this.last_name.length >= 3 || 
             this.email.length >= 3) {
-                $.postJSON('http://localhost:5000/users', data, this.showResult());
+                $.postJSON('http://localhost:5000/users/false', data, this.showResult());
             } else {
                 this.dispMessage = "You forgot to fill the Name and Email fields"
                 this.showRes = true;
