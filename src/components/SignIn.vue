@@ -44,9 +44,6 @@ export default {
         email: '',
         password: '',
     }),
-    components : {
-        navBar : navBar
-    },
     methods: {
         login() {
             var data = {
