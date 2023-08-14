@@ -20,7 +20,6 @@
                 <v-row justify-right width="200" class="searchBarContainer">
                     <v-text-field v-model="searchText" :loading="loading" class="justify-right" :append-inner-icon="true"
                     :prepend-icon="icon"
-
                     style="display:inline-block; min-width: 400px;">
                     <template #append-inner>
                         <RouterLink to="/searchResult">
@@ -44,7 +43,7 @@ import { mdiAccountGroup } from '@mdi/js'
 import searchPeople from '../components/searchPeople.vue';
 import { mdiMagnify } from '@mdi/js'
 import { mdiCloseCircle } from '@mdi/js'
-import { ref } from 'vue'
+
 function isloggedIn() {
     return true;
 }
@@ -65,7 +64,7 @@ export default {
             loading: false,
             mdiMagnify : mdiMagnify,
         }
-    },
+    }
 }
 
 </script>
