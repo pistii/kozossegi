@@ -4,22 +4,9 @@ import SignUp from '/src/components/SignUp.vue';
 
 
 export default {
-    props: {
-        BASEURL : 'http://localhost:5000/'
-    },
     components: {
         SignUp,
     },
-    data() {
-        return {
-            BASEURL
-        }
-    },
-    methods: {
-        getURL() {
-            return BASEURL;
-        }
-    }
 }
 </script>
 

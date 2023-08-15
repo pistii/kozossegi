@@ -38,6 +38,7 @@
 <script>
 import $ from 'jquery';
 import router from '/src/router/index.js';
+import { BASE_URL } from '../stores/base';
 
 export default {
     data: () => ({
@@ -54,7 +55,7 @@ export default {
                 lastName : "",
                 
             };
-            $.postJSON('http://localhost:5000/users/true', data, "");
+            $.postJSON(BASE_URL + '/users/true', data, "");
         }
     }
 }

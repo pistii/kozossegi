@@ -12,11 +12,9 @@
                 <RouterLink to="/messages"><svg-icon type="mdi" :path="pMessage"></svg-icon></RouterLink>
             </v-col>
             <v-col cols="3">
-
                 <v-icon path="pMagnify">mdi-magnify</v-icon>
                 <v-row justify-right width="200" class="searchBarContainer">
-                    <v-text-field v-model="searchText" :loading="loading" class="justify-right" :append-inner-icon="true"
-                        :prepend-icon="icon" style="display:inline-block; margin-right: 100px;">
+                    <v-text-field v-model="searchText" :loading="loading" class="justify-right" style="display:inline-block; margin-right: 100px;">
                         <template #append-inner>
                             <v-btn @click="search"><svg-icon type='mdi' :path="mdiMagnify" /></v-btn>
                         </template>
@@ -34,42 +32,20 @@ import TextAreaWithButton from '/src/components/TextAreaWithButton.vue';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiHomeCircle } from '@mdi/js'
 import { mdiAccountGroup } from '@mdi/js'
-import searchPeople from '../components/searchPeople.vue';
 import { mdiMagnify } from '@mdi/js'
 import { mdiCloseCircle } from '@mdi/js'
 import { mdiMessageBulleted } from '@mdi/js';
 import $ from 'jquery';
-import {ref} from 'vue';
-import BASEURL from '../components/Main.vue';
+import { ref } from 'vue';
 import router from '/src/router/index.js';
- 
-var searchText = ref();
-var unwrapped = ref(BASEURL.value + 'api/navigation/search/');
+import { BASE_URL } from '../stores/base';
 
-function isloggedIn() {
-    return true;
-}
-
-function search() {
-    $.ajax({
-        headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-    },
-        url : unwrapped.value + this.searchText,
-        type : "get",
-        success : function (jqXHR) {
-            alert(jqXHR.status);
-            //router.push("/searchResult");
-        },
-        error : function (jqXHR) {
-            console.log("error" + unwrapped.value);
-        }
-    });
-
-}
-
+const unwrapped = BASE_URL + "/api/navigation/search/";
+var responseData;
 export default {
+    props : {
+        unwrapped : String
+    },
     components: {
         SvgIcon,
         'accountGroup': accountGroup,
@@ -79,16 +55,50 @@ export default {
     },
     data() {
         return {
-            searchText: this.searchText,
+            searchText: '',
             pAccount: mdiAccountGroup,
             pHome: mdiHomeCircle,
             pMessage: mdiMessageBulleted,
             mdiMagnify: mdiMagnify,
             loading: false,
-            search,
+            
+            id : '',
+            firstName : '',
+            middleName : '',
+            lastName : '',
+            Friends : '',
+            birthOfPlace : '',
+        }
+    },
+    methods: {
+        search() {
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                url: unwrapped + this.searchText,
+                type: "get",
+                data : {
+                    'firstName' : this.firstName,
+                    'middleName' : this.middleName,
+                    'lastName' : this.lastName,
+                    'Friends' : this.Friends,
+                    'birthOfPlace' : this.birthOfPlace
+                },
+                success: function (data) {
+                    responseData = data
+                    router.push("/searchResult");
+                },
+                error: function (data) {
+                    console.log("server not available");
+                },
+            });
         }
     }
 }
+
+export {responseData}
 
 </script>
 
