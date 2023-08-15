@@ -113,7 +113,7 @@ export default {
             if (this.first_name.length >= 3 || 
             this.last_name.length >= 3 || 
             this.email.length >= 3) {
-                $.postJSON('http://localhost:5000/users/false', data, this.showResult());
+                $.postJSON(BASE_URL + 'users/false', data, this.showResult());
             } else {
                 this.dispMessage = "You forgot to fill the Name and Email fields"
                 this.showRes = true;
