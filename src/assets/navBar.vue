@@ -12,7 +12,6 @@
                 <RouterLink to="/messages"><svg-icon type="mdi" :path="pMessage"></svg-icon></RouterLink>
             </v-col>
             <v-col cols="3">
-                <v-icon path="pMagnify">mdi-magnify</v-icon>
                 <v-row justify-right width="200" class="searchBarContainer">
                     <v-text-field v-model="searchText" :loading="loading" class="justify-right" style="display:inline-block; margin-right: 100px;">
                         <template #append-inner>

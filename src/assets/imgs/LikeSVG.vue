@@ -39,3 +39,9 @@ export default {
     }
 }
 </script>
+
+<style>
+.like_svg {
+    cursor: pointer;
+}
+</style>

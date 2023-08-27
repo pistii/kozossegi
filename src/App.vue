@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import { ref, onMounted } from 'vue'
 import navBar from '/src/assets/navBar.vue'
+import '@mdi/font/css/materialdesignicons.css'
 
 </script>
 

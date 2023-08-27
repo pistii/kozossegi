@@ -35,7 +35,7 @@ textarea {
 
 .custom-button {
     position: absolute;
-    bottom: 30px;
+    bottom: 10px;
     right: 10px;
 }
 </style>

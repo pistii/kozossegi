@@ -1,6 +1,6 @@
 <template>
     <svg fill="#000000" height="30px" width="30px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve">
+        xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" class="comment_svg">
         <g>
             <path d="M72,128h88c4.418,0,8-3.582,8-8s-3.582-8-8-8H72c-4.418,0-8,3.582-8,8S67.582,128,72,128z" />
             <path d="M392,112H192c-4.418,0-8,3.582-8,8s3.582,8,8,8h200c4.418,0,8-3.582,8-8S396.418,112,392,112z" />
@@ -26,3 +26,9 @@ export default{
 
 }
 </script>
+
+<style>
+.comment_svg {
+    cursor: pointer;
+}
+</style>
