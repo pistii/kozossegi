@@ -37,12 +37,13 @@
                     </v-row>
                 </v-container>
                 <v-row>
-                    <v-text-field class="message" 
-                        placeholder="Write here your message..."
-                        append-inner-icon="mdi-send-circle" 
-                        v-model="messageTo"
-                        @click:append-inner="onSendMessage">
-
+                    <EmojiPicker v-if="EmojiVisible" @emoji_click="handleEmojiClick" />
+                    <svg-icon type="mdi" :path="mdiEmoticon" class="emoticon" @click="onEmojiPicker"></svg-icon>
+                    <audioPopupMenu v-if="menuOpen" class="audioPopup"></audioPopupMenu>
+                    <v-text-field class="messageBox" placeholder="Write here your message..."
+                        append-inner-icon="mdi-send-circle" v-model="messageTo" @click:append-inner="onSendMessage">
+                        <svg-icon class="microphoneIcon" type="mdi" :path="mdiMicrophone" @click="openMicrophoneDialog">
+                        </svg-icon>
                     </v-text-field>
                 </v-row>
             </v-col>
@@ -50,23 +51,48 @@
     </v-container>
 </template>
 
-<script>
+<script >
 import $ from 'jquery'
 import { ref } from 'vue'
-
+import audioEncoder from './audioEncoder'
+import audioPopupMenu from './audioPopupMenu.vue'
+import SvgIcon from '@jamescoyle/vue-icon'
+import { mdiMicrophone } from '@mdi/js'
+import { mdiEmoticon } from '@mdi/js'
+import EmojiPicker from './EmojiPicker.vue'
+import json from '../emojis-data.json'
 
 export default {
+    props: {
+        menuOpen: Boolean,
+        EmojiVisible: Boolean,
+
+    },
     components: {
+        SvgIcon,
+        audioPopupMenu,
+        EmojiPicker,
+
     },
     data() {
         return {
+            mdiMicrophone: mdiMicrophone,
+            mdiEmoticon: mdiEmoticon,
             loaded: false,
             loading: false,
             search: '',
             messageTo: '',
+            menuOpen: false,
+            EmojiVisible: false,
+            'Frequently used': {
+                emojiname: ''
+            }
         }
     },
     methods: {
+        callback(data) {
+            console.debug(data)
+        },
         onSearchMessage() {
             this.loading = true
 
@@ -76,8 +102,30 @@ export default {
                 + '<img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />'
                 + this.messageTo + '</div>');
             $("#messaging_area").append(e)
-            this.messageTo=''
+            this.messageTo = ''
+        },
+        openMicrophoneDialog() {
+            this.menuOpen = !this.menuOpen;
+        },
+        onEmojiPicker() {
+            this.EmojiVisible = !this.EmojiVisible
+        },
+        handleEmojiClick(emoji) {
+            this.messageTo += emoji;
+            var keys = Object.keys(json['Frequently used'])
+            var items = Object.entries(json);
+            console.log(items);
+            for (var i = 0; i < items.length; i++) {
+                for (let key in items[i]) {
+                    items.keys += emoji
+
+                    if (items[i][key].indexOf(emoji) != -1) {
+                        console.log(items[i])
+                    }
+                }
+            }
         }
+
     }
 }
 </script>
@@ -100,9 +148,10 @@ export default {
 
 .messaging_area {
     max-height: fit-content;
+    overflow-y: scroll;
 }
 
-.message {
+.messageBox {
     position: absolute;
     bottom: 0px;
     right: 0px;
@@ -116,19 +165,37 @@ export default {
     width: fit-content;
     height: 30px;
     margin-top: 50px;
-    margin-left: 50px;
     border: 1px dashed #ffffff;
     align-items: flex-start;
 }
 
 .messageTo {
     display: inline-block;
-    width:fit-content;
-    min-width:50%;
+    width: fit-content;
+    min-width: 60%;
     height: 30px;
+    float: right;
     margin-top: 50px;
-    margin-left: 50px;
     border: 1px dashed #ffffff;
-    align-items:flex-end;
+}
+
+.microphoneIcon {
+    cursor: pointer;
+}
+
+.audioPopup {
+    position: absolute;
+    bottom: 15%;
+    right: 0px;
+    min-width: 100%;
+    padding-left: 12px;
+}
+
+.emoticon {
+    cursor: pointer;
+    bottom: 15%;
+    right: 0;
+    height: 17px;
+    position: absolute;
 }
 </style>
