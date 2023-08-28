@@ -37,10 +37,11 @@
                     </v-row>
                 </v-container>
                 <v-row>
+                    
                     <EmojiPicker v-if="EmojiVisible" @emoji_click="handleEmojiClick" />
                     <svg-icon type="mdi" :path="mdiEmoticon" class="emoticon" @click="onEmojiPicker"></svg-icon>
-                    <audioPopupMenu v-if="menuOpen" class="audioPopup"></audioPopupMenu>
-                    <v-text-field class="messageBox" placeholder="Write here your message..."
+                    <AudioRecorder v-if="menuOpen" class="audioPopup"></AudioRecorder>
+                    <v-text-field class="messageBox" placeholder="Type here your message..."
                         append-inner-icon="mdi-send-circle" v-model="messageTo" @click:append-inner="onSendMessage">
                         <svg-icon class="microphoneIcon" type="mdi" :path="mdiMicrophone" @click="openMicrophoneDialog">
                         </svg-icon>
@@ -54,24 +55,21 @@
 <script >
 import $ from 'jquery'
 import { ref } from 'vue'
-import audioEncoder from './audioEncoder'
-import audioPopupMenu from './audioPopupMenu.vue'
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiMicrophone } from '@mdi/js'
 import { mdiEmoticon } from '@mdi/js'
 import EmojiPicker from './EmojiPicker.vue'
 import json from '../emojis-data.json'
-
+import AudioRecorder from './audioRecorder.vue'
 export default {
     props: {
         menuOpen: Boolean,
         EmojiVisible: Boolean,
-
     },
     components: {
         SvgIcon,
-        audioPopupMenu,
         EmojiPicker,
+        AudioRecorder,
 
     },
     data() {
@@ -90,6 +88,7 @@ export default {
         }
     },
     methods: {
+        
         callback(data) {
             console.debug(data)
         },
@@ -114,14 +113,19 @@ export default {
             this.messageTo += emoji;
             var keys = Object.keys(json['Frequently used'])
             var items = Object.entries(json);
-            console.log(items);
+            var hozzaad = {
+                'emoji': emoji
+            }
+            //Todo: Store the recently used emojis in db
+            console.log(items[0][1]);
+            items[0][1]["emoji"] = emoji
             for (var i = 0; i < items.length; i++) {
                 for (let key in items[i]) {
                     items.keys += emoji
 
-                    if (items[i][key].indexOf(emoji) != -1) {
-                        console.log(items[i])
-                    }
+                    // if (items[i][key].indexOf(emoji) != -1) {
+                    //     console.log(items[i])
+                    // }
                 }
             }
         }
