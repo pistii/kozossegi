@@ -27,17 +27,20 @@
                     </v-row>
                 </div>
             </v-col>
+
             <v-col style="position: relative;">
                 <v-container class="messaging_area" id="messaging_area">
                     <v-row>
                         <div class="messageFrom">
                             <img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />
                             Igazán hosszú üzenet
+                            
                         </div>
                     </v-row>
                 </v-container>
                 <v-row>
-                    
+                    <audioPlayer url="this.newAudio" />
+
                     <EmojiPicker v-if="EmojiVisible" @emoji_click="handleEmojiClick" />
                     <svg-icon type="mdi" :path="mdiEmoticon" class="emoticon" @click="onEmojiPicker"></svg-icon>
                     <AudioRecorder v-if="menuOpen" class="audioPopup"></AudioRecorder>
@@ -61,6 +64,8 @@ import { mdiEmoticon } from '@mdi/js'
 import EmojiPicker from './EmojiPicker.vue'
 import json from '../emojis-data.json'
 import AudioRecorder from './audioRecorder.vue'
+import audioPlayer from './audioPlayer.vue'
+
 export default {
     props: {
         menuOpen: Boolean,
@@ -70,6 +75,7 @@ export default {
         SvgIcon,
         EmojiPicker,
         AudioRecorder,
+        audioPlayer
 
     },
     data() {

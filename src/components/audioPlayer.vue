@@ -3,7 +3,7 @@
 		<v-menu :close-on-content-click="false">
 			<template v-slot:activator="{ on }">
 				<audio controls>
-					<source src="audio_url" type="audio/mpeg">
+					<source :src="this.url" type="audio/mpeg">
 				</audio>
 			</template>
 			<v-card>
@@ -14,4 +14,10 @@
 		</v-menu>
 	</div>
 </template>
+
+<script>
+export default {
+	props: ['url']
+}
+</script>
   

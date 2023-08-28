@@ -3,12 +3,12 @@
 
         <v-tooltip top>
             <template v-slot:activator="{ on }">
-                <v-btn v-if="!recorder" dark v-on="on">
-                    <svg-icon type="mdi" :path="mdiPlay" @click="record()"
+                <v-btn v-if="!recorder" dark v-on="on" @click="record()">
+                    <svg-icon type="mdi" :path="mdiPlay"
                         class="button is-info" />
                 </v-btn>
-                <v-btn v-else dark v-on="on">
-                    <svg-icon @click="stop()" type="mdi" :path="mdiPause" />
+                <v-btn v-else @click="stop()" dark v-on="on">
+                    <svg-icon type="mdi" :path="mdiPause" />
                 </v-btn>
                 <v-btn dark v-on="on">
                     <svg-icon type="mdi" :path="mdiRestart" />
@@ -69,9 +69,8 @@ export default {
 
             this.recorder.addEventListener("stop", () => {
                 this.newAudio = new Blob(recordedChunks);
-                console.log(this.newAudio);
             });
-
+            
             this.recorder.start();
         },
         async stop() {
