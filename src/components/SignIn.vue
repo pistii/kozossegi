@@ -37,8 +37,8 @@
 
 <script>
 import $ from 'jquery';
-import router from '/src/router/index.js';
 import { BASE_URL } from '../stores/base';
+import { loginUser } from '../utils/auth.js'
 
 export default {
     data: () => ({
@@ -47,48 +47,39 @@ export default {
     }),
     methods: {
         login() {
-            var data = {
-                email : this.email, 
-                password : this.password,
-                firstName : "",
-                middleName : "",
-                lastName : "",
-                
-            };
-            $.postJSON(BASE_URL + '/users/true', data, "");
+            loginUser(this.email, this.password);
+            // var data = {
+            //     email : this.email, 
+            //     password : this.password                
+            // };
+            // $.postJSON(BASE_URL + '/users/Authenticate', data, "");
         }
     }
 }
 
-$.postJSON = function(url, data, callback) {
-    return $.ajax({
-    headers: { 
-        'Accept': 'application/json',
-        'Content-Type': 'application/json' 
-    },
-    success: function(data, textStatus, jqXHR){
-        console.log(textStatus + ": " + jqXHR.status);
-        router.push({ path: '/myProfile' })
-    // do something with data
-    },
-    error: function(jqXHR, textStatus, errorThrown){
-        console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
-        $("#errorMsg").append("<h3>Email or password is wrong</h3>")
-    },
-    'type': 'POST',
-    'url': url,
-    'data': JSON.stringify(data),
-    'dataType': 'json'
-    });
-};
+// $.postJSON = function(url, data, callback) {
+//     return $.ajax({
+//     headers: { 
+//         'Accept': 'application/json',
+//         'Content-Type': 'application/json' 
+//     },
+//     success: function(data, textStatus, jqXHR){
+//         console.log(textStatus + ": " + jqXHR.status);
+//         console.log(data);
+//         //router.push({ path: '/myProfile' })
+//     // do something with data
+//     },
+//     error: function(jqXHR, textStatus, errorThrown){
+//         console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+//         $("#errorMsg").append("<h3>Email or password is wrong</h3>")
+//     },
+//     'type': 'POST',
+//     'url': url,
+//     'data': JSON.stringify(data),
+//     'dataType': 'json'
+//     });
+// };
 
-const chk = function(val) {
-    if (val == 500 || val == 404) {
-        alert('Error' + val);
-    } else {
-        alert("success" + val)
-    }
-}
 </script>
 
 <style>
