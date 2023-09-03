@@ -38,7 +38,7 @@ const routes = [
     {
         path: '/myProfile',
         name: 'profile',
-        component: () => import('../components/Profile.vue'),
+        component: () => import('../views/ProfileView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -46,7 +46,7 @@ const routes = [
     {
         path: '/searchPeople',
         name: 'searchPeople',
-        component: () => import('../components/searchPeople.vue'),
+        component: () => import('../views/searchPeopleView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -54,7 +54,7 @@ const routes = [
     {
         path: '/messages',
         name: 'message',
-        component: () => import('../components/Message.vue'),
+        component: () => import('../views/MessageView.vue'),
         meta: {
             requiresAuth: true
         }

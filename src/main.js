@@ -12,9 +12,10 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import SvgIcon from '@jamescoyle/vue-icon'
+import Vuex from 'vuex'
 
 const vuetify = createVuetify({
   components,
   directives,
 })
-createApp(App).use(vuetify).use(router).use(createPinia()).mount('#app')
+createApp(App).use(Vuex).use(vuetify).use(router).use(createPinia()).mount('#app')

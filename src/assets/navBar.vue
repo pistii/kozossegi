@@ -37,7 +37,9 @@ import { mdiMessageBulleted } from '@mdi/js';
 import $ from 'jquery';
 import { ref } from 'vue';
 import router from '/src/router/index.js';
-import { BASE_URL } from '../stores/base';
+import { BASE_URL } from '../stores/server_routes.js';
+import { isLoggedin, loginUser } from '../utils/auth.js'
+import { fetchData } from '../stores/server_routes';
 
 const unwrapped = BASE_URL + "/api/navigation/search/";
 var responseData;

@@ -14,16 +14,18 @@ export default {
 <template>
     <v-container>
         <v-col class="text-right">
-            <v-btn class="ml-2" color="primary" v-bind="props" to="/login">
-                Sign In
-            </v-btn>
+
 
         </v-col>
-        <v-row class="main_middle_container">
+        <v-row class="container">
+
             <v-img src="/src/assets/imgs/brandName.png"></v-img>
-
-            <SignUp />
-
+            <v-col cols="1">
+                <v-btn class="ml-2 mb-2" color="primary" v-bind="props" to="/login">
+                    Sign In
+                </v-btn>
+                <SignUp />
+            </v-col>
         </v-row>
 
     </v-container>

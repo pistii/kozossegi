@@ -28,19 +28,17 @@
                 </div>
             </v-col>
 
-            <v-col style="position: relative;">
+            <v-col style="position: relative; max-height: 600px;">
                 <v-container class="messaging_area" id="messaging_area">
                     <v-row>
                         <div class="messageFrom">
                             <img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />
                             Igazán hosszú üzenet
-                            
+
                         </div>
                     </v-row>
                 </v-container>
-                <v-row>
-                    <audioPlayer url="this.newAudio" />
-
+                <v-row style="max-height: 600px;">
                     <EmojiPicker v-if="EmojiVisible" @emoji_click="handleEmojiClick" />
                     <svg-icon type="mdi" :path="mdiEmoticon" class="emoticon" @click="onEmojiPicker"></svg-icon>
                     <AudioRecorder v-if="menuOpen" class="audioPopup"></AudioRecorder>
@@ -61,10 +59,10 @@ import { ref } from 'vue'
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiMicrophone } from '@mdi/js'
 import { mdiEmoticon } from '@mdi/js'
-import EmojiPicker from './EmojiPicker.vue'
+import EmojiPicker from '../components/EmojiPicker.vue'
 import json from '../emojis-data.json'
-import AudioRecorder from './audioRecorder.vue'
-import audioPlayer from './audioPlayer.vue'
+import AudioRecorder from '../components/audioRecorder.vue'
+import audioPlayer from '../components/audioPlayer.vue'
 
 export default {
     props: {
@@ -94,7 +92,7 @@ export default {
         }
     },
     methods: {
-        
+
         callback(data) {
             console.debug(data)
         },
@@ -103,11 +101,11 @@ export default {
 
         },
         onSendMessage() {
-            var e = $('<div class="messageTo">'
-                + '<img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />'
-                + this.messageTo + '</div>');
-            $("#messaging_area").append(e)
-            this.messageTo = ''
+            if (this.messageTo.length > 0) {
+                var e = $('<div class="messageTo">' + this.messageTo + '<img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" /></div>');
+                $("#messaging_area").append(e)
+                this.messageTo = ''
+            }
         },
         openMicrophoneDialog() {
             this.menuOpen = !this.menuOpen;
@@ -157,7 +155,7 @@ export default {
 }
 
 .messaging_area {
-    max-height: fit-content;
+    max-height: 80%;
     overflow-y: scroll;
 }
 
@@ -170,8 +168,8 @@ export default {
 }
 
 .messageFrom {
+    margin-inline: 12px;
     display: inline-block;
-    float: left;
     width: fit-content;
     height: 30px;
     margin-top: 50px;
@@ -180,12 +178,13 @@ export default {
 }
 
 .messageTo {
-    display: inline-block;
-    width: fit-content;
-    min-width: 60%;
-    height: 30px;
+    overflow-wrap: break-all;
     float: right;
-    margin-top: 50px;
+    word-break: break-all;
+    height: 30px;
+    margin-right: 12px;
+    margin-top: 30px;
+    margin-bottom: 12px;
     border: 1px dashed #ffffff;
 }
 

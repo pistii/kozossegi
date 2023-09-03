@@ -1,6 +1,6 @@
 import decode from "jwt-decode";
 import $ from 'jquery';
-import { BASE_URL } from '../stores/base.js';
+import { BASE_URL } from '../stores/server_routes.js';
 import router from '/src/router/index.js';
 
 const AUTH_TOKEN_KEY = 'token'
@@ -12,12 +12,14 @@ $.postJSON = function (url, data, callback) {
             'Content-Type': 'application/json'
         },
         success: function (data, textStatus, jqXHR) {
-            console.log(textStatus + ": " + jqXHR.status);
-            setAuthToken(data);
+            //console.log(textStatus + ": " + jqXHR.status);
+            localStorage.setItem('userInfo', JSON.stringify(data.personal))            
+            //console.log(localStorage.getItem('userInfo'))
+            setAuthToken(data.token);
             router.push({ path: '/myProfile' })
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.log(textStatus + ": " + jqXHR.status + " " + errorThrown);
+            
         },
         'type': 'POST',
         'url': BASE_URL + url,

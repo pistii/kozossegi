@@ -12,9 +12,25 @@ import '@mdi/font/css/materialdesignicons.css'
   <header>
 
   </header>
-  <navBar/>
+  <navBar />
 
   <RouterView />
+
+  <footer class="footer">
+    <v-row>
+      <v-col>
+        Contact
+      </v-col>
+    </v-row>
+  </footer>
 </template>
 
-<style scoped></style>
+<style>
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  background-color: rgba(26, 25, 25, 0.368);
+  text-align: left;
+}
+</style>

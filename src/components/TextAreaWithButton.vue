@@ -6,6 +6,8 @@
 </template>
   
 <script>
+import { fetchData } from '../stores/server_routes';
+
 export default {
     data() {
         return {
@@ -15,8 +17,9 @@ export default {
         };
     },
     methods: {
-        Comment() {
-            console.log("comment sent:", this.message);
+        async Comment() {
+            
+            const data = await fetchData('postComment');
         }
     }
 };
@@ -31,6 +34,8 @@ textarea {
     width: 100%;
     height: 200px;
     padding: 10px;
+    max-height:200px;
+
 }
 
 .custom-button {
