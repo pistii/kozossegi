@@ -9,7 +9,7 @@ export const fetchData = async (path, requestData) => {
 	const route = store.getters.getServerRoute(path);
 	
 	if (!route) {
-		console.error("Invalid route name"); //TODO: Későbbi megfelelő hibakezelés...
+		console.error("Invalid route name:" + path); //TODO: Későbbi megfelelő hibakezelés...
 		return;
 	}
 
@@ -101,6 +101,123 @@ export const fetchData = async (path, requestData) => {
 		});
 		return data;
 	}
+
+	if (path == 'register') {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				url: BASE_URL + '/users',
+				type: "POST",
+				data: requestData,
+				success: function (responseData, textStatus, jqXHR) {
+					console.log('success: ' + jqXHR.status);
+					resolve(textStatus);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log("error server_route " + jqXHR.status);
+					reject(data);
+				},
+			});
+		});	
+	};
+
+	if (path == "PostFriendRequest") {
+		try {
+			return new Promise((resolve, reject) => {
+				$.ajax({
+					headers: {
+						'Authorization': '',
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					success: function (responseData, textStatus, jqXHR) {
+						resolve(responseData);
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						reject(jqXHR.status);
+					},
+					'type': 'POST',
+					'url': BASE_URL + route,
+					'data': requestData,
+					'dataType': 'json'
+				});
+			});
+		} catch (Exception ) {
+			console.log(Exception)
+		}
+	};
+
+	if (path == 'GetNotifications') {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				url: BASE_URL + route + "/1/true", //Todo: this is for test for now
+				type: "get",
+				success: function (responseData, textStatus, jqXHR) {
+					//console.log(responseData[0])
+					resolve(responseData);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					reject(textStatus, jqXHR.status, errorThrown);
+				},
+			});
+		});
+	};
+
+	if (path == 'NotificationRead') {
+		try {
+			$.ajax({
+				headers: {
+					'Authorization': '',
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				success: function (responseData, textStatus, jqXHR) {
+					console.log("isreaded" + responseData)
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log("isn't readed" + jqXHR.status)
+				},
+				'type': 'POST',
+				'url': BASE_URL + route + requestData,
+				data: JSON.stringify(requestData),
+				'dataType': 'json'
+			});
+		}
+		catch (err) {
+			console.error("Error fetching data:", err);
+			return null;
+		}
+	};
+
+	if (path == 'GetAllPeople') {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				url: BASE_URL + route + requestData,
+				type: "get",
+				success: function (responseData, textStatus, jqXHR) {
+					resolve(responseData);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(BASE_URL + route + requestData)
+					reject(textStatus, jqXHR.status, errorThrown);
+				},
+			});
+		});
+	};
 }
 
+const PostMethod = () => {
+	
+}
 export { BASE_URL }

@@ -6,7 +6,12 @@ const store = createStore({
       getPosts: "/api/posts",
       postComment: "/api/postComment",
       uploadImage: "/api/personal/upload",
-      searchBox: '/api/search'
+      searchBox: '/api/search',
+      register: '/users',
+      PostFriendRequest: '/api/notification/postFriendRequest',
+      GetNotifications: '/api/notification',
+      NotificationRead: '/api/notification/notificationRead/',
+      GetAllPeople: '/api/personal/getAll/'
     }
   },
   getters: {
