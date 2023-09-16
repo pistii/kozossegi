@@ -14,7 +14,7 @@
                     <v-row>
                         <v-col class="profile_pic_container">
                             <div>
-                                <img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />
+                                <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
                             </div>
                         </v-col>
                         <v-col>
@@ -32,7 +32,7 @@
                 <v-container class="messaging_area" id="messaging_area">
                     <v-row>
                         <div class="messageFrom">
-                            <img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" />
+                            <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
                             Igazán hosszú üzenet
 
                         </div>
@@ -102,7 +102,7 @@ export default {
         },
         onSendMessage() {
             if (this.messageTo.length > 0) {
-                var e = $('<div class="messageTo">' + this.messageTo + '<img class="profile_pic" src="src/assets/imgs/blank_profile_pic.png" /></div>');
+                var e = $('<div class="messageTo">' + this.messageTo + '<img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" /></div>');
                 $("#messaging_area").append(e)
                 this.messageTo = ''
             }

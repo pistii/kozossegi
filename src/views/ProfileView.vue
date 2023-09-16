@@ -2,7 +2,7 @@
     <v-container>
         <div>
             <div>
-                <img v-if="!item.avatar" src="src/assets/imgs/blank_profile_pic.png" class="avatar" />
+                <img v-if="!item.avatar" src="/src/assets/imgs/blank_profile_pic.png" class="avatar" />
                 <img v-else :src="item.avatar" class="avatar" />
             </div>
             <input type="file" id="image_field">
@@ -21,7 +21,7 @@
                     <text-area-with-button />
                     <center-content></center-content>
                 </v-col>
-                <v-col style="background-color: transparent; width:auto; height: auto" lg="6" md="6" sm="6">
+                <v-col cols="auto" style="background-color: transparent; width:auto; height: auto" lg="6" md="6" sm="6">
                     <div v-if="hasNoFriends">
                         Még nincsenek ismerőseid... <a href="./searchPeople">Keress embereket...</a>
                     </div>
@@ -30,7 +30,7 @@
                             <v-col cols="4" xl="3" v-for="person in peopleArray" :key="person">
                                 <v-card color="#c5e2f0" theme="dark" max-width="150" class="text-center ml-4 mb-4">
                                     <v-avatar size="130" rounded="3">
-                                        <v-img src="src/assets/imgs/blank_profile_pic.png" />
+                                        <v-img src="/src/assets/imgs/blank_profile_pic.png" />
                                     </v-avatar>
                                     <v-card-action>
                                         <v-btn class='viewProfileBtn'>{{ person }}</v-btn>
@@ -44,13 +44,13 @@
                         <v-col>
                             <v-row>
                                 <v-avatar size="120" rounded="3">
-                                    <v-img src="src/assets/imgs/blank_profile_pic.png" />
+                                    <v-img src="/src/assets/imgs/blank_profile_pic.png" />
                                 </v-avatar>
                                 <v-avatar size="120" rounded="3">
-                                    <v-img src="src/assets/imgs/blank_profile_pic.png" />
+                                    <v-img src="/src/assets/imgs/blank_profile_pic.png" />
                                 </v-avatar>
                                 <v-avatar size="120" rounded="3">
-                                    <v-img src="src/assets/imgs/blank_profile_pic.png" />
+                                    <v-img src="/src/assets/imgs/blank_profile_pic.png" />
                                 </v-avatar>
                             </v-row>
                         </v-col>

@@ -37,7 +37,6 @@
 
 <script>
 import $ from 'jquery';
-import { BASE_URL } from '../stores/base';
 import { loginUser } from '../utils/auth.js'
 
 export default {

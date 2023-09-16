@@ -10,10 +10,25 @@
                 <RouterLink to="/myProfile"><svg-icon type="mdi" :path="pHome"></svg-icon></RouterLink>
                 <RouterLink to="/searchPeople"><svg-icon type="mdi" :path="pAccount"></svg-icon></RouterLink>
                 <RouterLink to="/messages"><svg-icon type="mdi" :path="pMessage"></svg-icon></RouterLink>
+                <a href="javascript:void(0)">
+                    <v-menu>
+                        <template v-slot:activator="{ props }">
+                            <svg-icon type="mdi" :path="mdiBell" color="primary" v-bind="props" />
+                        </template>
+                        <v-list>
+                            <v-list-item v-for="item in notificationMenuItems[0]" :key="notificationFrom" :value="index" @click="clickedOnNotification(item.notificationId, item.isReaded)" :title="item.notificationFrom" :subtitle="item.notificationContent" append-inner-icon="mdi-circle">
+                                <svg-icon v-if="!item.isReaded" type="mdi" :path="mdiCircleSmall" color="green" />
+                                <v-list-item-title class="text-caption">{{ item.createdAt }}</v-list-item-title>
+                                {{ item.content }}
+                            </v-list-item>
+                        </v-list>
+                    </v-menu>
+                </a>
             </v-col>
             <v-col cols="3">
                 <v-row justify-right width="200" class="searchBarContainer">
-                    <v-text-field v-model="searchText" :loading="loading" class="justify-right" style="display:inline-block; margin-right: 100px;">
+                    <v-text-field v-model="searchText" :loading="loading" class="justify-right"
+                        style="display:inline-block; margin-right: 100px;">
                         <template #append-inner>
                             <v-btn @click="search"><svg-icon type='mdi' :path="mdiMagnify" /></v-btn>
                         </template>
@@ -34,6 +49,8 @@ import { mdiAccountGroup } from '@mdi/js'
 import { mdiMagnify } from '@mdi/js'
 import { mdiCloseCircle } from '@mdi/js'
 import { mdiMessageBulleted } from '@mdi/js';
+import { mdiBell } from '@mdi/js';
+import { mdiCircleSmall } from '@mdi/js';
 import $ from 'jquery';
 import { ref } from 'vue';
 import router from '/src/router/index.js';
@@ -43,16 +60,25 @@ import { fetchData } from '../stores/server_routes';
 
 const unwrapped = BASE_URL + "/api/navigation/search/";
 var responseData;
+const notificationMenuItems = ref([]);
 export default {
-    props : {
-        unwrapped : String
+    setup() {
+        fetchData('GetNotifications').then(function(result) {
+            notificationMenuItems.value.push(result);
+            //console.log(notificationMenuItems.value[0])
+        });
+    },
+    props: {
+        unwrapped: String
     },
     components: {
         SvgIcon,
         'accountGroup': accountGroup,
         'text-area-with-button': TextAreaWithButton,
         'mdi-close-circle': mdiCloseCircle,
-        'mdi-message': mdiMessageBulleted
+        'mdi-message': mdiMessageBulleted,
+        'mdi-notification': mdiBell,
+        'mdi-circle-small': mdiCircleSmall
     },
     data() {
         return {
@@ -61,14 +87,18 @@ export default {
             pHome: mdiHomeCircle,
             pMessage: mdiMessageBulleted,
             mdiMagnify: mdiMagnify,
+            mdiBell,
+            mdiCircleSmall,
             loading: false,
-            
-            id : '',
-            firstName : '',
-            middleName : '',
-            lastName : '',
-            Friends : '',
-            birthOfPlace : '',
+
+            id: '',
+            firstName: '',
+            middleName: '',
+            lastName: '',
+            Friends: '',
+            birthOfPlace: '',
+
+            notificationMenuItems
         }
     },
     methods: {
@@ -80,12 +110,12 @@ export default {
                 },
                 url: unwrapped + this.searchText,
                 type: "get",
-                data : {
-                    'firstName' : this.firstName,
-                    'middleName' : this.middleName,
-                    'lastName' : this.lastName,
-                    'Friends' : this.Friends,
-                    'birthOfPlace' : this.birthOfPlace
+                data: {
+                    'firstName': this.firstName,
+                    'middleName': this.middleName,
+                    'lastName': this.lastName,
+                    'Friends': this.Friends,
+                    'birthOfPlace': this.birthOfPlace
                 },
                 success: function (data) {
                     responseData = data
@@ -95,11 +125,17 @@ export default {
                     console.log("server not available");
                 },
             });
+        },
+        clickedOnNotification(id, read) {
+            if (!read)
+            {
+                fetchData('NotificationRead', id);
+            }
         }
     }
 }
 
-export {responseData}
+export { responseData }
 
 </script>
 
