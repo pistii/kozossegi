@@ -7,11 +7,12 @@ const store = createStore({
       postComment: "/api/postComment",
       uploadImage: "/api/personal/upload",
       searchBox: '/api/search',
-      register: '/users',
+      register: '/users/Signup',
       PostFriendRequest: '/api/notification/postFriendRequest',
       GetNotifications: '/api/notification',
       NotificationRead: '/api/notification/notificationRead/',
-      GetAllPeople: '/api/personal/getAll/'
+      GetAllPeople: '/api/personal/getAll/',
+      GetUserById: '/users/'
     }
   },
   getters: {

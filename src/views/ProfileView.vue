@@ -5,11 +5,13 @@
                 <img v-if="!item.avatar" src="/src/assets/imgs/blank_profile_pic.png" class="avatar" />
                 <img v-else :src="item.avatar" class="avatar" />
             </div>
-            <input type="file" id="image_field">
-            <input type="text" id="description">
-            <input type="submit" id="submit" value="Submit" @click="uploadImage()">
+            <div v-if="isOwner">
+                <input type="file" id="image_field">
+                <input type="text" id="description">
+                <input type="submit" id="submit" value="Submit" @click="uploadImage()">
+            </div>
         </div>
-        <div>
+        <div> 
             <h2> {{ item.firstName }} {{ item.middleName }} {{ item.lastName }}</h2>
             <h3> {{ item.birthOfPlace }}</h3>
             <v-row>
@@ -61,19 +63,34 @@
     </v-container>
 </template>
 
-<script setup>
-const item = JSON.parse(localStorage.getItem('userInfo'));
-console.log(item)
-</script>
 
 <script>
 import TextAreaWithButton from '../components/TextAreaWithButton.vue';
 import CenterContent from '/src/assets/imgs/CenterContent.vue';
 import $ from 'jquery';
 import { fetchData } from '../stores/server_routes.js';
+import { useRoute, useRouter } from 'vue-router'
+import {ref, onMounted, watch, computed} from 'vue'
 
-const peopleArray = ['Gipsz Jakab', 'ifj. Gipsz Jakab', 'Gipsz Jakabné', 'John Gipsz', 'Gipsz Jakabovics'];
+//Todo: with authentication set the profile page if the user visits his/her own page
+//load images, comments, posts, send posts, upload image, change profile picture, 
+let item = ref({});
+const isOwner = false; 
+
 export default {
+    setup() {
+        const route = useRoute()
+        const router = useRouter()
+        onMounted(async () => {
+            if (isOwner) {
+                item.value = JSON.parse(localStorage.getItem('userInfo'));
+            } else {
+                await router.isReady()
+                const response = await fetchData('GetUserById', route.params.id).then(value => item.value = value).catch((err) => console.log(err));
+                item.value = response || {};
+            }
+        });
+    },
     methods: {
         uploadImage() {
             var fileInput = document.getElementById('image_field');
@@ -90,9 +107,12 @@ export default {
             fetchData('uploadImage', JSON.stringify(Data))
         }
     },
+
     data() {
         return {
             hasNoFriends: false,
+            item, 
+            isOwner
         }
     },
     components: {
