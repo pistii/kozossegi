@@ -10,30 +10,47 @@
                         prepend-inner-icon="mdi-magnify" rounded density="compact" variant="solo-filled"
                         @click:prepend-inner="onSearchMessage"></v-text-field>
                 </v-row>
-                <div v-for="x in 10">
-                    <v-row>
-                        <v-col class="profile_pic_container">
-                            <div>
-                                <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
-                            </div>
-                        </v-col>
-                        <v-col>
-                            <v-row>Gipsz Jakab</v-row>
-                            <v-row>message </v-row>
-                        </v-col>
-                        <v-col class="message_time">
-                            12:00
-                        </v-col>
-                    </v-row>
+                <div>
+                    <div v-for="(room, index) in chatRooms">
+                        <div v-for="item in room.chatContents">
+                            <v-row class="pb-5">
+                                <v-hover>
+                                    <template v-slot:default="{ isHovering, props }">
+                                        <v-card class="px-2" 
+                                            variant="tonal" 
+                                            :color="isHovering ? 'primary' : undefined" 
+                                            v-bind="props" width="100%" 
+                                            @click="showMessage(room.chatRoomId)">
+                                            <v-col class="profile_pic_container">
+                                                <div>
+                                                    <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
+                                                </div>
+                                            </v-col>
+                                            <v-col>
+                                                <v-row >
+                                                    <span class="overflowing-text">{{ item.message }}
+                                                    </span>
+                                                </v-row>
+                                            </v-col>
+                                            <v-col class="message_time">
+                                                {{ formatDate(room.endedDateTime) }}
+                                            </v-col>
+                                        </v-card>
+                                    </template>
+                                </v-hover>
+                            </v-row>
+
+                        </div>
+                    </div>
                 </div>
             </v-col>
 
             <v-col style="position: relative; max-height: 600px;">
-                <v-container class="messaging_area" id="messaging_area">
+                <v-container class="messaging_area" id="messaging_area" v-for="item in chatContent">
                     <v-row>
                         <div class="messageFrom">
                             <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
-                            Igazán hosszú üzenet
+                            {{ item }}
 
                         </div>
                     </v-row>
@@ -55,7 +72,7 @@
 
 <script >
 import $ from 'jquery'
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiMicrophone } from '@mdi/js'
 import { mdiEmoticon } from '@mdi/js'
@@ -63,8 +80,29 @@ import EmojiPicker from '../components/EmojiPicker.vue'
 import json from '../emojis-data.json'
 import AudioRecorder from '../components/audioRecorder.vue'
 import audioPlayer from '../components/audioPlayer.vue'
+import { fetchData } from '../stores/server_routes.js';
+import moment from 'moment'
+
+let response = ref([]);
+let data = ref([]);
+let chatContent = ref([]);
 
 export default {
+    setup() {
+        onMounted(async () => {
+            const userId = 19;
+            try {
+                data.value = await fetchData('GetAllChatRoom', 19);
+                console.log(data)
+            }
+            catch (error) {
+                console.log(error);
+            }
+        })
+        // fetchData('GetMessages', 11)
+        //     .then(value => response.value = value)
+        //     .catch((error) => console.log(error)); 
+    },
     props: {
         menuOpen: Boolean,
         EmojiVisible: Boolean,
@@ -88,7 +126,9 @@ export default {
             EmojiVisible: false,
             'Frequently used': {
                 emojiname: ''
-            }
+            },
+            response,
+            chatRooms: data,
         }
     },
     methods: {
@@ -132,8 +172,29 @@ export default {
                     // }
                 }
             }
-        }
+        },
 
+        formatDate(date) {
+            const today = new Date();
+            let passedTime = today.getDate() - moment(date).date();
+            if (passedTime > 1) { //Ha több mint egy nap telt el
+                return moment(date).format("YYYY-MM-DD")
+            }
+            else {
+                return moment(date).format("HH:mm")
+            }
+        },
+
+        async showMessage(chatRoomId) {
+            try {
+                let content = await fetchData('GetChatContent', chatRoomId);
+                chatContent.value.push(content);
+                console.log(content);
+            }
+            catch (error) {
+                console.log(error);
+            }        
+        }
     }
 }
 </script>
@@ -206,5 +267,16 @@ export default {
     right: 0;
     height: 17px;
     position: absolute;
+}
+
+.overflowing-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 5px;
+}
+
+.messageContainer {
+    overflow: hidden;
 }
 </style>

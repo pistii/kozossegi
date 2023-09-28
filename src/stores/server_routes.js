@@ -3,7 +3,9 @@ import $ from 'jquery'
 import store from '../stores/config.js';
 //https://vuex.vuejs.org/guide/getters.html#method-style-access
 
-const BASE_URL = "http://localhost:5000"
+const BASE_URL = "http://localhost:5000/"
+
+
 
 export const fetchData = async (path, requestData) => {
 	const route = store.getters.getServerRoute(path);
@@ -11,6 +13,60 @@ export const fetchData = async (path, requestData) => {
 	if (!route) {
 		console.error("Invalid route name:" + path); //TODO: Későbbi megfelelő hibakezelés...
 		return;
+	}
+
+	const Get = () => {
+		return new Promise((resolve, reject) => {
+			$.ajax({
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				url: BASE_URL + route + requestData,
+				type: "get",
+				success: function (responseData, textStatus, jqXHR) {
+					console.log("get: ", responseData)
+					resolve(responseData);
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(errorThrown, 'url: ' + BASE_URL + route + requestData);
+					reject(textStatus, jqXHR.status, errorThrown);
+				},
+			});
+		});
+	};
+
+	const Post = () => {
+		try {
+			$.ajax({
+				headers: {
+					'Authorization': '',
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				success: function (data, textStatus, jqXHR) {
+					console.log("no resp" + data)
+				},
+				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(jqXHR , " ", textStatus, errorThrown)
+				},
+				'type': 'POST',
+				'url': BASE_URL + route,
+				'dataType': 'json'
+			});
+		}
+		catch (err) {
+			console.error("Error fetching data:", err);
+			return null;
+		}
+	}
+
+	if (path == 'GetAllPeople') { return Get(); };
+	if (path == "GetChatContent") { return Get(); };
+	
+	//Todo: connection
+	if (path == 'postComment') {
+		return Post();
 	}
 
 	if (requestData) { // if has request body, for post and put
@@ -48,33 +104,6 @@ export const fetchData = async (path, requestData) => {
 		}
 	}
 
-	//Todo: connection
-	if (path == 'postComment') {
-		try {
-			$.ajax({
-				headers: {
-					'Authorization': '',
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				},
-				success: function (data, textStatus, jqXHR) {
-					console.log("no resp" + data)
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					console.log(jqXHR , " ", textStatus, errorThrown)
-				},
-				'type': 'POST',
-				'url': BASE_URL + route,
-				'dataType': 'json'
-			});
-			
-		}
-		catch (err) {
-			console.error("Error fetching data:", err);
-			return null;
-		}
-	}
-
 
 	if (path == 'searchBox') {
 		$.ajax({
@@ -106,19 +135,20 @@ export const fetchData = async (path, requestData) => {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				headers: {
+					'Authorization': '',
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
 				url: BASE_URL + '/users',
 				type: "POST",
-				data: requestData,
+				'data': requestData,
 				success: function (responseData, textStatus, jqXHR) {
 					console.log('success: ' + jqXHR.status);
 					resolve(textStatus);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
-					console.log("error server_route " + jqXHR.status);
-					reject(data);
+					console.log("error server_route " + requestData);
+					reject(requestData);
 				},
 			});
 		});	
@@ -149,26 +179,48 @@ export const fetchData = async (path, requestData) => {
 			console.log(Exception)
 		}
 	};
+	
 
-	if (path == 'GetNotifications') {
+	if (path == 'GetAllChatRoom') {
+		const id = requestData;
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				headers: {
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
-				url: BASE_URL + route + "/1/true", //Todo: this is for test for now
+				url: BASE_URL + route + requestData,
 				type: "get",
 				success: function (responseData, textStatus, jqXHR) {
-					//console.log(responseData[0])
+					console.log("get: ", responseData)
 					resolve(responseData);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
+					console.log(errorThrown)
 					reject(textStatus, jqXHR.status, errorThrown);
 				},
 			});
-		});
-	};
+		});	}
+
+		if (path == 'GetNotifications') {
+			return new Promise((resolve, reject) => {
+				$.ajax({
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					url: BASE_URL + route + "18/true", //Todo: this is for test for now
+					type: "get",
+					success: function (responseData, textStatus, jqXHR) {
+						//console.log(responseData[0])
+						resolve(responseData);
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						reject(textStatus, jqXHR.status, errorThrown);
+					},
+				});
+			});
+		};
 
 	if (path == 'NotificationRead') {
 		try {
@@ -196,7 +248,8 @@ export const fetchData = async (path, requestData) => {
 		}
 	};
 
-	if (path == 'GetAllPeople') {
+
+	if (path == 'GetUserById') {
 		return new Promise((resolve, reject) => {
 			$.ajax({
 				headers: {
@@ -209,15 +262,19 @@ export const fetchData = async (path, requestData) => {
 					resolve(responseData);
 				},
 				error: function (jqXHR, textStatus, errorThrown) {
-					console.log(BASE_URL + route + requestData)
+					console.log(textStatus, jqXHR.status, errorThrown)
 					reject(textStatus, jqXHR.status, errorThrown);
 				},
 			});
 		});
 	};
+
+
+	
 }
 
 const PostMethod = () => {
 	
 }
+
 export { BASE_URL }
