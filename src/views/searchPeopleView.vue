@@ -15,43 +15,97 @@
                     </v-card-action>
                 </v-card>
             </v-col>
+                <Pagination :totalItems="totalItems" v-if="isVisible"/>
         </v-row>
     </v-container>
+
 </template>
 
 <script>
 import { fetchData } from '../stores/server_routes.js';
-import { ref } from 'vue';
-//Todo: Get the json parameters properly
+import { ref, watch } from 'vue';
+import PaginationComponent from '../components/PaginationComponent.vue'
+import store from '../stores/PaginationStore';
+import { mapState, mapMutations, mapGetters } from 'vuex';
+import { provide } from 'vue';
+
 var data = ref('');
 
-const x = 12
-const userId = 190; //Todo: redefine
 const userArray = ref([]);
 var response = ref('');
 var checkedUser = ref(false);
+//var totalItems = ref(null);
+
 export default {
-    async created() {
-        response = await fetchData('GetAllPeople', userId).then(value => userArray.value.push(value))
+    components: {
+        Pagination: PaginationComponent,
+    },
+    props: {
+        currentPage: Number
+    },
+    computed: {
+        ...mapGetters(['currentPage']),
+        page () { //its for the watcher, 
+            return store.state.currentPage
+        }
+    },
+    watch: { //checks if the vuex getter currentPage changes, then starts a new data request
+        async page(newVal) {
+            userArray.value = [];
+            await fetchData('GetAllPeople', newVal)
+                            .then(value => {
+                                userArray.value.push(value.data);
+                                this.totalItems = value.totalItems;
+                            });
+        }
+        
+    },
+    async created() { //load the data
+        response = await fetchData('GetAllPeople', 1)
+                            .then(value => {
+                                userArray.value.push(value.data);
+                                this.totalItems = value.totalItems;
+                                
+                                this.totalItems = value.totalItems;
+                                this.isVisible = true
+                            });
     },
     data() {
         return {
             userArray,
             data,
-            checkedUser
+            checkedUser, 
+            response,
+            totalItems: 0, isVisible: false
         }
     },
     methods: {
         friendRequest(id) {
-            data = JSON.stringify({
-                "requestFrom": userId,
-                "requestTo": id  //to whom send the request
-            })
-            var send = fetchData('PostFriendRequest', data).then(result => console.log(result)) 
-            checkedUser.value = !checkedUser.value
-        }
+            console.log(store.getters.currentPage)
+
+            // data = JSON.stringify({
+            //     "requestFrom": userId,
+            //     "requestTo": id  //to whom send the request
+            // })
+            // var send = fetchData('PostFriendRequest', data).then(result => console.log(result)) 
+            // checkedUser.value = !checkedUser.value
+        },
+
     }
 }
-</script>
 
-<style></style>
+</script>
+<style>
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+#particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+</style>
