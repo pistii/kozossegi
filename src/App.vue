@@ -12,9 +12,22 @@ import '@mdi/font/css/materialdesignicons.css'
   <header>
 
   </header>
-  <navBar />
+  <KeepAlive>
+    <navBar />
+  </KeepAlive>
 
-  <RouterView />
+  
+  <v-row>
+    <!--responsiveness: 
+      https://vuetifyjs.com/en/styles/display/#visibility
+    -->
+  <v-col class="d-none d-md-block">
+  </v-col>
+  <v-col cols="auto" >      
+    <RouterView />
+  </v-col>
+  <v-col class="d-none d-md-block">
+  </v-col>
 
   <footer class="footer">
     <v-row>
@@ -23,6 +36,7 @@ import '@mdi/font/css/materialdesignicons.css'
       </v-col>
     </v-row>
   </footer>
+</v-row>
 </template>
 
 <style>

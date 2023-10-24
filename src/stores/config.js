@@ -3,9 +3,7 @@ import { createStore } from "vuex";
 const store = createStore({
   state: {
     serverRoutes: {
-      getPosts: "api/posts",
-      postComment: "api/postComment",
-      uploadImage: "api/personal/upload",
+      uploadImage: "api/personal/upload/",
       Search: 'api/navigation/search/',
       register: 'api/users/Signup/',
       login: 'api/users/Authenticate/',
@@ -16,7 +14,12 @@ const store = createStore({
       NotificationRead: 'api/notification/notificationRead/',
       GetAllPeople: 'api/personal/getAll/',
       GetUserById: 'api/users/',
-      PostChatMessage: 'api/chat/newChat'
+      PostChatMessage: 'api/chat/newChat/',
+      MyProfile: 'api/personal/myprofile/',
+      //posts - comments
+      CreateNewPost: 'api/post/createNew/',
+      GetAllPost: "api/post/GetAll/",
+      postComment: "api/postComment/",
     }
   },
   getters: {

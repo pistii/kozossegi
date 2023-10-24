@@ -34,16 +34,31 @@
                                 <v-text-field label="Password*" type="password" required v-model="state.password"
                                     :rules="passwordRuless"></v-text-field>
                             </v-col>
+                            <v-col cols="8">
+                                <v-title>Gender*</v-title>
+                                <v-radio-group v-model="isMale" inline >
+                                    <v-radio label="Female" value="false"></v-radio>
+                                    <v-radio label="Male" value="true"></v-radio>
+                                </v-radio-group>
+                            </v-col>
                         </v-row>
                         <v-row>
                             <v-col sm="3">
-                                <v-select :items="state.year" label="Year*" required :rules="yearRuless"></v-select>
+                                <v-select :items="state.year" label="Year*" required 
+                                v-model="selectedYear"
+                                :rules="yearRuless"></v-select>
                             </v-col>
                             <v-col sm="3">
-                                <v-select :items="state.month" label="Month*" required :rules="monthRuless"></v-select>
+                                <v-select :items="state.month" v-model="selectedMonth" label="Month*" required :rules="monthRuless"></v-select>
                             </v-col>
                             <v-col sm="3">
-                                <v-select :items="state.day" label="Day*" required :rules="dayRuless"></v-select>
+                                <v-select :items="state.day" label="Day*" 
+                                v-model="selectedDay"
+                                required :rules="dayRuless"></v-select>
+                            </v-col>
+                            <v-col cols="8" sm="6" md="4">
+                                <v-text-field label="Place of birth" required v-model='state.PlaceOfBirth'
+                                    :rules="cityRuless"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-form>
@@ -70,29 +85,30 @@
 </template>
 
 <script>
-import $ from "jquery";
 import { onMounted, ref } from 'vue';
 import { reactive } from 'vue'
 import { useVuelidate } from '@vuelidate/core'
 import { email, required } from '@vuelidate/validators'
-import { BASE_URL, fetchData } from "../stores/server_routes";
+import { fetchData } from "../stores/server_routes";
 
 var state = ref(null);
-
+const selectedYear = ref(null);
+const selectedMonth = ref(null);
+const selectedDay = ref(null);
 
 export default {
 
     setup() {
-        const dateNow = new Date();
         const initialState = {
             first_name: '',
             middle_name: '',
             last_name: '',
+            PlaceOfBirth: '',
             email: '',
             password: '',
             year: [],
             month: [],
-            day: []
+            day: [],
         }
 
         state = reactive({
@@ -161,7 +177,11 @@ export default {
         ],
         dayRules: [
             v => !!v || "Day is required",
-        ]
+        ],
+        selectedYear, 
+        selectedMonth, 
+        selectedDay,
+        isMale: false
     }),
     methods: {
         async validate() {
@@ -173,14 +193,16 @@ export default {
         },
         async register() {
             var f = this.$refs.form.value
+            var formatDate =  selectedYear.value + "-" + 7 + "-" + selectedDay.value;
             var data = {
-                first_name: state.first_name,
-                middle_name: state.middle_name,
-                last_name: state.last_name,
+                firstName: state.first_name,
+                middleName: state.middle_name,
+                lastName: state.last_name,
                 email: state.email,
                 password: state.password,
-                dateOfBirth: Date.parse(state.year, state.month, state.day),
-                registrationDate: Date.now()
+                birthDay: formatDate,
+                PlaceOfBirth: state.PlaceOfBirth,
+                isMale: this.isMale
             }
 
             if (this.state.first_name.length >= 3 ||
@@ -188,7 +210,8 @@ export default {
                 this.email.length >= 3) 
             {
                 try {
-                    const response = await fetchData('register', JSON.stringify(data));
+                    console.log(formatDate)
+                    const response = await fetchData('register', data);
                     console.log(response)
                 } catch (error) {
                     console.log(error);

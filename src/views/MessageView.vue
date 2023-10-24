@@ -1,22 +1,24 @@
 <template>
     <v-container>
         <v-row>
-            <v-col cols="5">
+            <v-col cols="4">
                 <v-row>
                     <h3>Messages</h3>
                 </v-row>
+                <div>
                 <v-row>
                     <v-text-field placeholder="Search..." v-model="search" single-line :loading=this.loading
                         prepend-inner-icon="mdi-magnify" rounded density="compact" variant="solo-filled"
                         @click:prepend-inner="onSearchMessage"></v-text-field>
                 </v-row>
-                <div>
+                <!--Left messagerooms panel-->
+                <div class="left_msgroom_pane section">
                     <div v-for="(room, index) in chatRooms">
                         <div v-for="item in room.chatContents">
                             <v-row class="pb-5">
                                 <v-hover>
                                     <template v-slot:default="{ isHovering, props }">
-                                        <v-card class="px-2" 
+                                        <v-card class="px-6" 
                                             variant="tonal" 
                                             :color="isHovering ? 'primary' : undefined" 
                                             v-bind="props" width="100%" 
@@ -39,21 +41,15 @@
                                     </template>
                                 </v-hover>
                             </v-row>
-
                         </div>
                     </div>
                 </div>
+                </div>
             </v-col>
-
+            <!--right messagebox area-->
             <v-col style="position: relative; max-height: 600px;">
-                <v-container class="messaging_area" id="messaging_area" v-for="item in chatContent">
-                    <v-row>
-                        <div class="messageFrom">
-                            <img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" />
-                            {{ item }}
-
-                        </div>
-                    </v-row>
+                <v-container class="messaging_area section" id="messaging_area">
+                    
                 </v-container>
                 <v-row style="max-height: 600px;">
                     <EmojiPicker v-if="EmojiVisible" @emoji_click="handleEmojiClick" />
@@ -83,25 +79,20 @@ import audioPlayer from '../components/audioPlayer.vue'
 import { fetchData } from '../stores/server_routes.js';
 import moment from 'moment'
 
-let response = ref([]);
 let data = ref([]);
 let chatContent = ref([]);
 
 export default {
     setup() {
         onMounted(async () => {
-            const userId = 19;
             try {
-                data.value = await fetchData('GetAllChatRoom', 19);
-                console.log(data)
+                data.value = await fetchData('GetAllChatRoom');
+                //console.log(data)
             }
             catch (error) {
                 console.log(error);
             }
         })
-        // fetchData('GetMessages', 11)
-        //     .then(value => response.value = value)
-        //     .catch((error) => console.log(error)); 
     },
     props: {
         menuOpen: Boolean,
@@ -127,23 +118,30 @@ export default {
             'Frequently used': {
                 emojiname: ''
             },
-            response,
             chatRooms: data,
+            chatContent,
+
         }
     },
     methods: {
-
         callback(data) {
             console.debug(data)
         },
         onSearchMessage() {
             this.loading = true
-
         },
-        onSendMessage() {
+        async onSendMessage() {
             if (this.messageTo.length > 0) {
-                var e = $('<div class="messageTo">' + this.messageTo + '<img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" /></div>');
-                $("#messaging_area").append(e)
+                this.AddMessagesToChat(this.messageTo, true)
+                var user = JSON.parse(localStorage.getItem('userId'));
+                console.log(user)
+                let data = {
+                    "senderId" : user,
+                    "receiverId": 15, //Todo: Get the recieverId
+                    "message": this.messageTo,
+                    "status": 1
+                }
+                const resp = await fetchData("PostChatMessage", data);
                 this.messageTo = ''
             }
         },
@@ -187,13 +185,29 @@ export default {
 
         async showMessage(chatRoomId) {
             try {
+                console.log(chatRoomId)
                 let content = await fetchData('GetChatContent', chatRoomId);
-                chatContent.value.push(content);
                 console.log(content);
+                $("#messaging_area").empty()
+                content.forEach(element => {
+                    this.AddMessagesToChat(element.message, false);
+                });
             }
             catch (error) {
                 console.log(error);
             }        
+        },
+
+        AddMessagesToChat(message, isSender) {
+            if (isSender) {
+                var e = $('<div class="fill-space"></div><div class="messageTo">' + this.messageTo + '<img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png" /></div>');
+                $("#messaging_area").append(e)
+                chatContent.value.push(this.messageTo)
+            } else {
+                var msg = $('<v-row class="fill-space"><div class="messageFrom"><img class="profile_pic" src="/src/assets/imgs/blank_profile_pic.png"/>' + message + '</div></v-row>')
+                $("#messaging_area").append(msg)
+                chatContent.value.push(msg)
+            }
         }
     }
 }
@@ -217,7 +231,13 @@ export default {
 
 .messaging_area {
     max-height: 80%;
-    overflow-y: scroll;
+    overflow-y: auto;
+}
+
+.left_msgroom_pane {    
+    overflow-y: auto;
+    overflow-x: hidden;
+    height:480px;
 }
 
 .messageBox {
@@ -226,25 +246,29 @@ export default {
     right: 0px;
     min-width: 100%;
     padding-left: 12px;
+    display:inline-block;
+    flex-direction: column;
+
 }
 
 .messageFrom {
     margin-inline: 12px;
-    display: inline-block;
     width: fit-content;
     height: 30px;
     margin-top: 50px;
     border: 1px dashed #ffffff;
     align-items: flex-start;
+    display:block;
 }
 
 .messageTo {
     overflow-wrap: break-all;
     float: right;
+    display:block;
     word-break: break-all;
     height: 30px;
     margin-right: 12px;
-    margin-top: 30px;
+    margin-top: 0px;
     margin-bottom: 12px;
     border: 1px dashed #ffffff;
 }
@@ -278,5 +302,22 @@ export default {
 
 .messageContainer {
     overflow: hidden;
+}
+
+.fill-space {
+    width: 100%;
+    display:inline-block;
+}
+
+.section::-webkit-scrollbar {
+  width: 12px;
+}
+.section::-webkit-scrollbar-track {
+  background-color: rgba(172, 170, 173, 0.517);
+  border-radius: 5px;
+}
+.section::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 6px rgb(10, 151, 239);
+  border-radius: 3px;
 }
 </style>

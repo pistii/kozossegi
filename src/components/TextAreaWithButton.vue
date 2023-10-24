@@ -1,6 +1,6 @@
 <template>
         <div class="textarea-container">
-            <v-textarea v-model="message" placeholder="Type your message here..." />
+            <v-textarea v-model="msgBox" placeholder="Type your message here..." />
             <v-btn class="custom-button" @click="Comment">Send</v-btn>
         </div>
 </template>
@@ -11,15 +11,14 @@ import { fetchData } from '../stores/server_routes';
 export default {
     data() {
         return {
-            message: "",
+            msgBox: "",
             
 
         };
     },
     methods: {
         async Comment() {
-            
-            const data = await fetchData('postComment');
+            fetchData('postComment', this.msgBox);
         }
     }
 };
@@ -30,7 +29,7 @@ export default {
     position: relative;
 }
 
-textarea {
+.textarea {
     width: 100%;
     height: 200px;
     padding: 10px;

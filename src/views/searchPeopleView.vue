@@ -1,7 +1,7 @@
 <template>
-    <v-container class="d-flex justify-center cc">
+    <v-container >
         <v-row>
-            <v-col v-for="(user, n) in userArray[0]" :key="n" cols="12" sm="4" lg="auto" md="auto" xl="auto">
+            <v-col v-for="(user, n) in userArray[0]" :key="n"  sm="4" lg="auto" md="auto" xl="auto">
                 <v-card class="mr-5 ml-5" color="#1b4e54" theme="dark" max-width="200" :title="user.firstName + ' ' + user.lastName"
                     :class="['justify-center align-center bg-secondary', `elevation-${x}`]">
                     <v-avatar size="130" rounded="3">
@@ -15,7 +15,7 @@
                     </v-card-action>
                 </v-card>
             </v-col>
-                <Pagination :totalItems="totalItems" v-if="isVisible"/>
+            <Pagination :totalItems="totalItems" v-if="isVisible"/>
         </v-row>
     </v-container>
 
