@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { isLoggedin } from '../utils/auth.js'
+import { isLoggedin, removeAuthToken } from '../utils/auth.js'
 
 const routes = [
     {
@@ -12,33 +12,43 @@ const routes = [
         }
     },
     {
-        path: '/about',
-        name: 'about',
-        // route level code-splitting
-        // this generates a separate chunk (About.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import('../views/AboutView.vue')
+        path: '/validate/:token',
+        name: 'validate',
+        component: () => import('@/components/RegistrationSuccess.vue'),
+        meta: {
+            allowAnonymous: true
+        },
+        
     },
     {
-        path: '/signup',
+        path: '/register',
         name: 'register',
-        component: () => import('../components/SignUp.vue'),
+        component: () => import('@/components/SignUp.vue'),
         meta: {
             allowAnonymous: true
         }
     },
     {
-        path: '/login',
+        path: '/login', //TODO: Check valid token before reenters the site: https://stackoverflow.com/questions/46262094/checking-auth-token-valid-before-route-enter-in-vue-router
         name: 'login',
-        component: () => import('../components/SignIn.vue'),
+        component: () => import('@/components/SignIn.vue'),
         meta: {
             allowAnonymous: true
-        }
+        },
+        beforeEnter: (to, from, next) => {
+            // Ellenőrzi, hogy az útvonalhoz bejelentkezés szükséges-e
+            if (to.meta.allowAnonymous && !isLoggedin()) {
+                next();
+            } else {
+                next('/');
+            }
+        },
+        
     },
     {
         path: '/myProfile',
         name: 'profile',
-        component: () => import('../views/ProfileView.vue'),
+        component: () => import('@/views/ProfilePage/ProfileView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -46,7 +56,7 @@ const routes = [
     {
         path: '/searchPeople',
         name: 'searchPeople',
-        component: () => import('../views/searchPeopleView.vue'),
+        component: () => import('@/views/searchPeopleView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -54,7 +64,7 @@ const routes = [
     {
         path: '/messages',
         name: 'message',
-        component: () => import('../views/MessageView.vue'),
+        component: () => import('@/views/Message/MessageView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -62,7 +72,7 @@ const routes = [
     {
         path: '/searchResult',
         name: 'searchResult',
-        component: () => import('../components/searchResult.vue'),
+        component: () => import('@/components/searchResult.vue'),
         meta: {
             requiresAuth: true
         }
@@ -70,7 +80,7 @@ const routes = [
     {
         path: '/profile=:id',
         name: 'viewProfile',
-        component: () => import('../views/ProfileView.vue'),
+        component: () => import('@/views/ProfilePage/ProfileView.vue'),
         meta: {
             requiresAuth: true
         }
@@ -83,18 +93,20 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    if (to.name == 'login' && isLoggedin()) {
-      next({ name: 'myProfile' })
-  }
-  else if (!to.meta.allowAnonymous && !isLoggedin()) {
-      next({
-          path: '/',
-          query: { redirect: to.fullPath }
-      })
-  }
-  else {
-      next()
-  }
+    
+        if (to.name == 'login' && isLoggedin()) {
+            next({ name: 'myProfile' })
+        }
+        else if (!to.meta.allowAnonymous && !isLoggedin()) {
+            next({
+                path: '/',
+                query: { redirect: to.fullPath }
+            })
+        }
+        else {
+            next();
+        }
   })
+
 
 export default router

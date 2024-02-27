@@ -1,40 +1,42 @@
 <template>
-    <v-container >
+    <v-container>
         <v-row>
-            <v-col v-for="(user, n) in userArray[0]" :key="n"  sm="4" lg="auto" md="auto" xl="auto">
+            <v-col v-for="(user, n) in userArray[0]" :key="user.id" >
                 <v-card class="mr-5 ml-5" color="#1b4e54" theme="dark" max-width="200" :title="user.firstName + ' ' + user.lastName"
-                    :class="['justify-center align-center bg-secondary', `elevation-${x}`]">
+                    :class="['justify-center align-center bg-secondary', `elevation-${13}`]">
                     <v-avatar size="130" rounded="3">
-                        <v-img v-if="user.avatar" :src="user.avatar" /> <v-img v-else src="/src/assets/imgs/blank_profile_pic.png"></v-img>
+                        <v-img :src=getUserAvatar(user.avatar)></v-img>
                     </v-avatar>
-                    <v-card-actions>
-                        <v-btn @click="friendRequest(user.id)"><div v-if="checkedUser">Jelölve</div><div v-else>Jelölés</div></v-btn>
-                    </v-card-actions>
-                    <v-card-action>
+                    
+                        <v-btn @click="sendFriendRequest(user)" :text='checkedUser ? "Jelölve" : "Jelölés"' :key="n">
+                        </v-btn>
                         <v-btn><RouterLink :to="{ path:'/profile='+user.id }">Profil megtekintése</RouterLink></v-btn>
-                    </v-card-action>
+                    
                 </v-card>
             </v-col>
-            <Pagination :totalItems="totalItems" v-if="isVisible"/>
+            <v-col>
+                <Pagination :totalItems="totalItems" v-if="isVisible"/>
+            </v-col>
         </v-row>
     </v-container>
-
 </template>
 
 <script>
-import { fetchData } from '../stores/server_routes.js';
-import { ref, watch } from 'vue';
-import PaginationComponent from '../components/PaginationComponent.vue'
-import store from '../stores/PaginationStore';
-import { mapState, mapMutations, mapGetters } from 'vuex';
-import { provide } from 'vue';
+import store from '@/stores/PaginationStore';
+import UserStore from '@/stores/UserStore';
+import fetchData from '@/stores/server_routes.js';
+import eventBus from '@/stores/eventBus';
 
+import PaginationComponent from '@/components/PaginationComponent.vue'
+import { addFriend } from './ProfilePage/ProfilePageHeaderComponent.vue';
+import { getUserAvatar } from '@/utils/common';
+
+import { ref, } from 'vue';
 var data = ref('');
 
 const userArray = ref([]);
 var response = ref('');
 var checkedUser = ref(false);
-//var totalItems = ref(null);
 
 export default {
     components: {
@@ -44,31 +46,26 @@ export default {
         currentPage: Number
     },
     computed: {
-        ...mapGetters(['currentPage']),
-        page () { //its for the watcher, 
+        page () {
             return store.state.currentPage
         }
     },
-    watch: { //checks if the vuex getter currentPage changes, then starts a new data request
+    watch: { //checks if the store currentPage changes, and starts a new data request
         async page(newVal) {
             userArray.value = [];
-            await fetchData('GetAllPeople', newVal)
-                            .then(value => {
-                                userArray.value.push(value.data);
-                                this.totalItems = value.totalItems;
-                            });
+            await fetchData.methods.fetchData('GET', 'GetAllPeople', null, this.userId, newVal)
+                .then(value => {
+                    userArray.value.push(value.data);
+                    this.totalItems = value.totalPages;
+                });
         }
         
     },
-    async created() { //load the data
-        response = await fetchData('GetAllPeople', 1)
-                            .then(value => {
-                                userArray.value.push(value.data);
-                                this.totalItems = value.totalItems;
-                                
-                                this.totalItems = value.totalItems;
-                                this.isVisible = true
-                            });
+    mounted() {
+        eventBus.on("getAllFriends", this.SearchContext)
+    },
+    created() { //load the data
+        this.SearchHandler()
     },
     data() {
         return {
@@ -76,22 +73,40 @@ export default {
             data,
             checkedUser, 
             response,
-            totalItems: 0, isVisible: false
+            totalItems: 0, isVisible: false,
+            userId: UserStore.state.userId,
+            addFriend, getUserAvatar
         }
     },
     methods: {
-        friendRequest(id) {
-            console.log(store.getters.currentPage)
-
-            // data = JSON.stringify({
-            //     "requestFrom": userId,
-            //     "requestTo": id  //to whom send the request
-            // })
-            // var send = fetchData('PostFriendRequest', data).then(result => console.log(result)) 
-            // checkedUser.value = !checkedUser.value
+        async sendFriendRequest(user) { //TODO a komponens szétválasztása a "jelölve/jelölés btn felirat" miatt
+            addFriend(user);
+            checkedUser.value = !checkedUser.value
+            console.log(this.totalItems)
         },
-
+        SearchContext(context) { //This method triggers when the eventBus called from ProfilePage Show More friends option
+            this.SearchHandler("GetAllFriends", context)
+        },
+        async SearchHandler(searchParameter, data) { //The handler, if 
+            if (searchParameter === undefined) {
+                response = await fetchData.methods.fetchData('GET', 'GetAllPeople', null, this.userId, 1)
+                    .then(value => {
+                        userArray.value.push(value.data);
+                        console.log(value)
+                        this.totalItems = value.totalPages;
+                        this.isVisible = true
+                    });
+                }
+            else if (searchParameter === "GetAllFriends") {
+                userArray.value.push(data); //Receives the 50 friends from the friendsComponent
+            }
+        },
+        
+    },
+    beforeUnmount() {
+        eventBus.off('getAllFriends', this.SearchContext)
     }
+
 }
 
 </script>

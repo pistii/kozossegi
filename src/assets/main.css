@@ -1,5 +1,64 @@
 body {
-    background-image: url('src/assets/imgs/pxfuel.jpg');
-    background-size: cover ;
-    height: fit-content;
+    background: linear-gradient(to bottom, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%);
+}
+
+a:link, a:visited {
+    color:#dbdcef;
+}
+
+.onHover {
+   cursor: pointer;
+}
+
+
+
+
+.spinner {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    animation: spinner-plncf9 4s infinite;
+ }
+ 
+ .spinner::before,
+ .spinner::after {
+    content: "";
+    grid-area: 1/1;
+    border: 9px solid;
+    border-radius: 50%;
+    border-color: #474bff #474bff #0000 #0000;
+    mix-blend-mode: darken;
+    animation: spinner-plncf9 1s infinite linear;
+ }
+ 
+ .spinner::after {
+    border-color: #0000 #0000 #dbdcef #dbdcef;
+    animation-direction: reverse;
+ }
+ 
+ @keyframes spinner-plncf9 {
+    100% {
+       transform: rotate(1turn);
+    }
+ }
+
+ .authorName {
+   color: #528cbbef; 
+   font-family:'Franklin Gothic Medium'; 
+   text-decoration: none;
+}
+
+
+.scrollbar::-webkit-scrollbar {
+   width: 12px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+   background-color: rgba(172, 170, 173, 0.517);
+   border-radius: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+   box-shadow: inset 0 0 6px rgb(10, 151, 239);
+   border-radius: 3px;
 }

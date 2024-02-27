@@ -4,7 +4,6 @@ import MainPage from '../components/Main.vue'
 
 <template>
   <main>
-    <MainPage />
-    
+    <MainPage /> <!--TODO: copy from main-->
   </main>
 </template>

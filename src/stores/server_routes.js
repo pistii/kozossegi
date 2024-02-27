@@ -1,177 +1,161 @@
-import { mapGetters } from "vuex";
-import $ from 'jquery'
+import $, { error } from 'jquery'
 import store from '../stores/config.js';
+import { ref } from "vue";
+import UserStore from './UserStore.js';
+import { getAuthToken } from '../utils/auth';
+
+//import auth from '../utils/auth.js'
 //https://vuex.vuejs.org/guide/getters.html#method-style-access
 
 const BASE_URL = "http://localhost:5000/"
-var userId = 18;
+const AUTH_TOKEN_KEY = UserStore.state.auth_token;
 
-export const fetchData = async (path, requestData) => {
+export default{
+	data() {
+		return {
+			getAuthToken,
+			
+		}
+	},
+	methods: {
+		async fetchData(method, path, requestData = null, param1 = null, param2 = null, param3 = null) {
+			const route = store.getters.getServerRoute(path); //pl getObject, és ahol a path egyezik, az alapján valósítani meg az auth, és kérelmeket.
+			
+			if (!route) {
+				console.error("Invalid route name:" + path); //TODO: Későbbi megfelelő hibakezelés... pl 404 page
+				return;
+			}
+			//console.log(param1, param2)
+
+			const request = async (method, path, data, parameter1 = null, parameter2 = null, parameter3 = null) => {
+				let url = BASE_URL + path;
+				// console.log("URL: " + url)
+				// console.log("PATH: " + path)
+				// console.log("RequestData: " + data)
+				// console.log("param1: " + parameter1)
+				// console.log("param2: " + parameter2)
+
+				if (parameter1 != null) {
+				  url += parameter1;
+				  //console.log("paraméter1");
+				  if (parameter2 !== null) {
+					url += "/" + parameter2;
+					//console.log("paraméter2");
+					if (parameter3 !== null) {
+						console.log("paraméter3");
+						url += "/" + parameter3;
+					  }
+				  }
+				  console.log(url)
+				}
+				
+				let headers = {
+				  'Accept': 'application/json',
+				  'Content-Type': 'application/json'
+				};
+				
+				if (path !== 'api/users/Signup/' && !path.includes("api/users/ForgotPw/") && !path.includes("checkVerCode")) {
+					console.log(path)
+					headers['Authorization'] = 'Bearer ' + AUTH_TOKEN_KEY 
+					
+				}
+				console.log(headers)
+
+				try {
+					return new Promise((resolve, reject) => {
+						$.ajax({
+						  headers: headers,
+						  url: url,
+						  type: method,
+						  data: JSON.stringify(data),
+						  dataType: "JSON",
+						  success: function (responseData, textStatus, jqXHR) {
+							resolve(responseData);
+						  },
+						  error: function (jqXHR, textStatus, errorThrown) {
+							console.log(errorThrown, 'status: ' + textStatus, "errorThrown: " + errorThrown);
+							reject(textStatus, jqXHR.status, errorThrown);
+						  },
+						});
+					  });
+				} catch (error) {
+				  console.error('Error:', error);
+				  throw error;
+				}
+			  };
+
+			const Get = (parameter1 = null, parameter2 = null, parameter3 = null) => {
+				return request('GET', route, null, parameter1, parameter2, parameter3);
+			};
+			const Post = () => {
+				return request('POST', route, requestData)
+			};
+			const Put = (param1 = null, param2 = null) => {
+				return request('PUT', route, requestData, param1, param2)
+			}
+			const Delete = (param1 = null) => {
+				return request('DELETE', route, requestData, param1)
+			}
+
+			if (method === 'GET') {
+				return await Get(param1, param2, param3);
+			}
+			else if (method === 'POST') {
+				return await Post();
+			}
+			else if (method === 'PUT') {
+				return await Put(param1, param2);
+			}
+			else if (method === 'DELETE') {
+				return await Delete(param1);
+			}
+		}
+	}
+}
+
+export async function PostImage(method, path, formData, param1 = null) {
 	const route = store.getters.getServerRoute(path);
-	
+			
 	if (!route) {
-		console.error("Invalid route name:" + path); //TODO: Későbbi megfelelő hibakezelés...
+		console.error("Invalid route name:" + path); 
 		return;
 	}
-
-	//params is not necessary but it can be added if required by the path
-	const Get = (param1 = null, param2 = null) => {
-		let url = BASE_URL + route;
-		if (param1 != null) {
-			url += param1;
-		if (param1 != null && param2 != null) {
-			url += "/" + param2;
-		}
-			console.log("TEST Parameters" + url);
-		}
-		return new Promise((resolve, reject) => {
-			$.ajax({
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				},
-				url: url,
-				type: "get",
-				success: function (responseData, textStatus, jqXHR) {
-					//console.log("get: ", responseData)
-					resolve(responseData);
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					console.log(errorThrown, 'url: ' + url);
-					reject(textStatus, jqXHR.status, errorThrown);
-				},
-			});
-		});
-	};
-
-	const Post = () => {
-		try {
-			return new Promise((resolve, reject) => {
-				$.ajax({
-					headers: {
-						'Authorization': '',
-						'Accept': 'application/json',
-						'Content-Type': 'application/json'
-					},
-					success: function (data, textStatus, jqXHR) {
-						//console.log("success:" + data)
-						resolve(textStatus);
-					},
-					error: function (jqXHR, textStatus, errorThrown) {
-						console.log("error: " + jqXHR , " ", textStatus, errorThrown
-						+ "| sentData: " + JSON.stringify(requestData)
-						)
-						reject(errorThrown);
-					},
-					'type': 'POST',
-					'url': BASE_URL + route,
-					'data': JSON.stringify(requestData),
-					'dataType': 'json'
-				});
-			})
-		}
-		catch (err) {
-			console.error("Error fetching data:", err);
-			return null;
-		}
-	}
-
-	if (path == 'GetUserById') return Get()
-	if (path == 'GetAllChatRoom' || 
-		path == 'GetChatContent') return Get(userId)
-	if (path == 'GetNotifications') return Get(userId + "/true")
-	if (path == 'GetAllPeople') return Get(userId + "/" + requestData)
-	if (path == 'Search') return Get(requestData)
-
-	if (path == 'postComment' || 
-		path == 'register' || 
-		path == "PostChatMessage" ||
-		path == "PostFriendRequest" ||
-		path == 'NotificationRead'
-		) return await Post()
-	
-	if (path == 'uploadImage') {
-		// console.log(path, requestData);
-		var myBuffer = new ArrayBuffer(16);
-		var img = new Int8Array(myBuffer);
-		let jsondata = {
-			userId: 1,
-			img: "123,123,123,123",
-			token: "sdfgpj5345"
-		}
-
+	return new Promise((resolve, reject) => {
 		$.ajax({
-			headers: {
-				'Authorization': '',
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
+			type: method,
+			url: param1 != null ? BASE_URL + route + param1 : BASE_URL + route, 
+			data: formData,
+			cache: false,
+			contentType: false,
+			processData: false,
+			success: function(data)
+			{
+				//console.log("success");
+				resolve(data);
+				console.log(data);
 			},
-			success: function (responseData, textStatus, jqXHR) {
-				console.log("success")
-				console.log(textStatus + ": " + jqXHR.status);
-			},
-			error: function (jqXHR, textStatus, errorThrown) {
-				console.log("error " + textStatus + ": " + jqXHR.status + " " + errorThrown);
-			},
-			'type': 'PUT',
-			'url': BASE_URL + route,
-			'data': JSON.stringify(requestData),
-			'dataType': 'json'
+			error: function (jqXHR, textStatus, errorThrown)
+			{
+				reject(textStatus)
+				console.log('URL: ' +  param1 != null ? BASE_URL + route + param1 : BASE_URL + route)
+				console.log("error: " + jqXHR + "; " + textStatus + "; " + errorThrown);
+				//console.log(data);
+			}
 		});
-	}
-	
-	// if (path == 'searchBox') {
-	// 	$.ajax({
-	// 		headers: {
-	// 			'Accept': 'application/json',
-	// 			'Content-Type': 'application/json'
-	// 		},
-	// 		url: unwrapped + this.searchText,
-	// 		type: "get",
-	// 		data: {
-	// 			'firstName': this.firstName,
-	// 			'middleName': this.middleName,
-	// 			'lastName': this.lastName,
-	// 			'Friends': this.Friends,
-	// 			'birthOfPlace': this.birthOfPlace
-	// 		},
-	// 		success: function (data) {
-	// 			responseData = data
-	// 			router.push("/searchResult");
-	// 		},
-	// 		error: function (data) {
-	// 			console.log("server not available");
-	// 		},
-	// 	});
-	// 	return data;
-	// }
-
-	// if (path == 'NotificationRead') {
-	// 	try {
-	// 		$.ajax({
-	// 			headers: {
-	// 				'Authorization': '',
-	// 				'Accept': 'application/json',
-	// 				'Content-Type': 'application/json'
-	// 			},
-	// 			success: function (responseData, textStatus, jqXHR) {
-	// 				console.log("isreaded" + responseData)
-	// 			},
-	// 			error: function (jqXHR, textStatus, errorThrown) {
-	// 				console.log("isn't readed" + jqXHR.status)
-	// 			},
-	// 			'type': 'POST',
-	// 			'url': BASE_URL + route + requestData,
-	// 			data: JSON.stringify(requestData),
-	// 			'dataType': 'json'
-	// 		});
-	// 	}
-	// 	catch (err) {
-	// 		console.error("Error fetching data:", err);
-	// 		return null;
-	// 	}
-	// };
-
+	});
 }
+
+// 			if (path == 'postComment' || 
+// 				path == 'register' || 
+// 				path == "PostChatMessage" ||
+// 				path == "PostFriendRequest" ||
+// 				path == 'CreateNewPost' ||
+// 				path == 'AddFriend'
+// 				) return await Post()
+
+// 			if (path == 'DeleteFriend') return await Delete()
+// 			if (path == "AcceptFriendRequest") return await Post()
+// 			if (path == 'NotificationRead') return await Post() //TODO: this requires tests
+
 
 export { BASE_URL }

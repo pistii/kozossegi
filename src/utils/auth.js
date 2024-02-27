@@ -2,32 +2,44 @@ import decode from "jwt-decode";
 import $ from 'jquery';
 import { BASE_URL } from '../stores/server_routes.js';
 import router from '/src/router/index.js';
+import store from "../stores/UserStore.js";
+import { disconnect } from "./hub.js";
+
 
 const AUTH_TOKEN_KEY = 'token'
 
-$.postJSON = function (url, data, callback) {
-    $.ajax({
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        success: function (data, textStatus, jqXHR) {
-            //console.log(textStatus + ": " + jqXHR.status);
-            localStorage.setItem('userInfo', JSON.stringify(data.personal))            
-            //console.log(localStorage.getItem('userInfo'))
-            setAuthToken(data.token);
-            router.push({ path: '/myProfile' })
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            
-        },
-        'type': 'POST',
-        'url': BASE_URL + url,
-        'data': JSON.stringify(data),
-        'dataType': 'json'
-    });
-}
 
+$.postJSON = function (url, data) {
+    try {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                method: 'POST',
+                url: BASE_URL + url,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify(data),
+                dataType: 'json',
+                success: function (data, textStatus, jqXHR) {
+                    console.log(textStatus + ": " + jqXHR.status);
+                    resolve(data);
+                    // store.commit('setUser', JSON.stringify(data.personal));
+                    // store.commit('setUserId', data.personal.id);
+                    // setAuthToken(data.token);        
+                    // store.dispatch('login').then(() => {
+                    //     router.push({ path: '/myProfile' });
+                    // })
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    reject(errorThrown, textStatus);
+                },
+            });
+        });
+    } catch (error) {
+        console.error("An error occurred:", error);
+    }
+};
 
 export function loginUser(email, password) {
     return new Promise(async (resolve, reject) => {
@@ -36,38 +48,62 @@ export function loginUser(email, password) {
                 email: email,
                 password: password
             }
-            $.postJSON('/users/Authenticate', data, "");
-            resolve();
+            
+            var response = await $.postJSON('api/users/Authenticate', data);
+            store.dispatch('login', {
+                user: JSON.stringify(response.personal),
+                userId: response.personal.id,
+                token: response.token,
+              }).then(() => {
+                console.log(data)
+                setAuthToken(response.token);
+                //console.log("USERID: " + store.state.userId);
+                router.push({ path: '/myProfile' });
+                resolve(true);
+            });
         }
         catch (err) {
             console.log(err);
-            reject();
+            reject(err);
         }
     });
 }
 
 export function logoutUser() {
     clearAuthToken();
+    disconnect(); //from the chat message
 }
 
 export function setAuthToken(token) {
-    $.postJSON({
-        beforeSend: function(xhr) {
-            xhr.setRequestHeader('Authorization', 'Bearer ' + data);
+    // Set the Authorization header for all subsequent AJAX requests
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
         }
     });
-    localStorage.setItem(AUTH_TOKEN_KEY, token)
+    store.commit('setAuthToken', token);
+}
+
+export function getAuthTokenAuth() {
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+    });
 }
 
 export function getAuthToken() {
-    return localStorage.getItem(AUTH_TOKEN_KEY);
+    return store.state.auth_token;
 }
 
 export function clearAuthToken() {//Delete the token from header: https://stackoverflow.com/questions/18491368/is-there-any-way-to-remove-ajax-headers-set-by-setrequestheader
+    removeAuthToken();
+    localStorage.clear();
+}
+
+export function removeAuthToken() {
     $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-        //delete options.headers['custom-xid-header'];
         delete options.headers['Authorization']
-        localStorage.removeItem(token);
     });
 }
 
@@ -96,5 +132,6 @@ export function getAuthTokenExpirationDate(encodedToken) {
 
 function isTokenExpired(token) {
     let expirationDate = getAuthTokenExpirationDate(token)
-    return expirationDate < new Date(0)
+    //console.log(expirationDate)
+    return expirationDate < new Date(0) 
 }

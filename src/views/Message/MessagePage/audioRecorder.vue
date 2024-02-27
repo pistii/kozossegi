@@ -7,13 +7,13 @@
         <v-tooltip top>
             <template v-slot:activator="{ on }">
                 <v-btn v-if="!recorder" dark v-on="on" @click="record()">
-                    <svg-icon type="mdi" :path="mdiPlay" class="button is-info" />
+                    <v-icon class="button is-info">mdi-play</v-icon>
                 </v-btn>
                 <v-btn v-else @click="stop()" dark v-on="on">
-                    <svg-icon type="mdi" :path="mdiPause" />
+                    <v-icon>mdi-pause</v-icon>
                 </v-btn>
                 <v-btn dark v-on="on">
-                    <svg-icon type="mdi" :path="mdiRestart" />
+                    <v-icon>mdi-restart</v-icon>
                 </v-btn>
                 <audioPlayer v-if="newAudio" :audio="this.newAudioURL" />
 
@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiPlay } from '@mdi/js'
 import { mdiPlayPause } from '@mdi/js'
 import { mdiPause } from '@mdi/js'
@@ -36,7 +35,6 @@ export default {
         menuOpen: Boolean,
     },
     components: {
-        SvgIcon,
         audioPlayer,
     },
     data() {

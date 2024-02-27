@@ -15,8 +15,8 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { mapState, mapMutations } from 'vuex';
-import store from '../stores/PaginationStore';
+import { mapState } from 'vuex';
+import store from '@/stores/PaginationStore';
 
 var lastTwo = ref(3);
 var firstTwo = ref(0);
@@ -26,7 +26,6 @@ export default {
         ...mapState(['currentPage'])
     },
     props: {
-        currentPage: Number,
         totalItems: Number
     },
     data() {
@@ -113,6 +112,7 @@ export default {
 .pagination {
     display: inline-block;
     margin-bottom: 150px;
+    padding-inline: 30%;
 }
 
 footer {
