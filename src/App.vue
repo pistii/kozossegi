@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-import navBar from '@/assets/navBar.vue'
+import navBar from '@/components/navBar/navBar.vue'
 import OnlineFriendsView from '@/views/OnlineFriendsView.vue';
 import OverlayMessageDialogComponent from '@/views/OverlayMessageDialogComponent.vue'
 import '@mdi/font/css/materialdesignicons.css'
