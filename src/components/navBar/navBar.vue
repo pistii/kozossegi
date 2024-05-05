@@ -1,6 +1,9 @@
 <template>
-    <nav >
-        <v-row >
+    <nav class="navBar">
+        <v-row v-if="display.smAndDown" class="justify-center">
+            <mobileView  />
+        </v-row>
+        <v-row v-else>
             <div class=" flex-container">
                 <brandName :isLoggedin="isLoggedin()" />
                 <v-col lg="6" md="5" sm="3" xs="2" class="navBarMiddleIcons col-sm-2"  v-if="isLoggedin()">
