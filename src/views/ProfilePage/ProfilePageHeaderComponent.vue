@@ -19,7 +19,9 @@
         </div>
         
         <div class="px-6 pa-3">
-            <h2>{{getFullName(getUser.firstName, getUser.middleName, getUser.lastName)}}</h2>
+            <h2 class="avatarFullName">
+                {{getFullName(getUser.firstName, getUser.middleName, getUser.lastName)}}
+            </h2>
             <h3> {{ user.birthOfPlace }}</h3>
         </div>
     </v-sheet>
@@ -34,7 +36,7 @@
 </template>
 
 <script>
-import ProfilePageSettingsComponent from './ProfilePageSettingsComponent.vue';
+import SettingsComponent from '@/components/SettingsComponent.vue';
 import { getUserAvatar, getFullName } from '../../utils/common'
 import store from '@/stores/UserStore'
 import fetchData from '@/stores/server_routes'
@@ -49,7 +51,7 @@ export default {
     },
     emits: ['removeFriend'],
     components: {
-        'profile-settings' : ProfilePageSettingsComponent,
+        'profile-settings' : SettingsComponent,
     },
     computed: {
         getUser() {
@@ -80,7 +82,7 @@ export default {
         }, 
 
         closeModal() {
-            this.modal = false, this.$forceUpdate();
+            this.modal = false;
         }
         
     }
@@ -100,3 +102,28 @@ export async function addFriend(user) {
     }
 }
 </script>
+
+<style scoped>
+
+h2.avatarFullName {
+    font-size: 25px;
+}
+
+@media screen and (min-width: 600px) {
+  h2.avatarFullName {
+    font-size: 19px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  h2.avatarFullName {
+    font-size: 2.7vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  h2.avatarFullName {
+    font-size: 15px;
+  }
+}
+</style>
