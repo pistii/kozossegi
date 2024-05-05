@@ -15,7 +15,6 @@ export default createStore({
     messageHub: [],
     userFriends: [],
     onlineFriends: [],
-    shouldshowNewPasswordRestoreDialog: true,
     overlayLoading: false,
   },
   mutations: {
@@ -47,9 +46,6 @@ export default createStore({
     },
     setOnlineFriends(state, friends) {
       state.onlineFriends = friends
-    },
-    setPasswordModifyDialog(state, param) {
-      state.shouldshowNewPasswordRestoreDialog = param;
     },
     setOverlayLoading(state, param) {
       state.overlayLoading = param;
@@ -84,9 +80,7 @@ export default createStore({
     getoverlayLoading: (state) => () => {
       return state.overlayLoading;
     },
-    shouldshowNewPasswordRestoreDialog(state) {
-      return state.shouldshowNewPasswordRestoreDialog;
-    },
+    
   },
   plugins: [createPersistedState({
     storage: {
