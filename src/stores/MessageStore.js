@@ -43,6 +43,9 @@ export default createStore({
     setFrequentlyUsedEmojis(state, emoji) {
       state.emojis = emoji;
     },
+    setNewMessageReceived(state, message) {
+      state.newMessages.push(message);
+    },
   },
   getters: {
     getPartnerId: (state) => () => {
@@ -71,6 +74,9 @@ export default createStore({
     },
     getFrequentlyUsedEmojis: (state) => () => {
       return state.emojis;
+    },
+    getNewMessages: (state) => () => {
+      return state.newMessages;
     },
   },
   actions: {
