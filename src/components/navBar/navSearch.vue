@@ -7,14 +7,16 @@
 			v-on:keyup.enter="search()">
 
 			<template #append-inner>
-				<v-btn @click="search()" >
-					<v-progress-circular
-						v-if="loading"
-						indeterminate
-						color="primary"
-					></v-progress-circular>
-					<v-icon v-else>mdi-magnify</v-icon>
-				</v-btn>
+				<v-progress-circular
+					v-if="loading"
+					indeterminate
+					color="primary"
+				></v-progress-circular>
+				<v-icon @click="search()" 
+					style="font-size: 19.5px"
+					:disabled="loading" 
+					 v-else>mdi-magnify
+				</v-icon>
 			</template>
 
 		</v-text-field>
@@ -22,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, defineModel } from 'vue';
+import { ref } from 'vue';
 import fetchData from '@/stores/server_routes';
 import store from '@/stores/UserStore';
 import { useRouter } from 'vue-router';
@@ -34,7 +36,7 @@ const router = useRouter();
 
 
 async function search() {
-	if (searchText.value !== "") {
+	if (searchText !== "") {
 		loading.value = true;
 
 		await fetchData.methods.fetchData('GET', 'Search', null, store.state.userId, this.searchText)
@@ -47,7 +49,7 @@ async function search() {
 				//Notify UI
 				searchText = '';
 				loading.value = false;
-			}, 2000);
+			}, 100);
 			
 		});
 	};
