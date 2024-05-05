@@ -9,12 +9,12 @@ var chatConnection;
 var notificationConnection;
 
 async function SetupConnection(callback) {
-    connection = new signalR.HubConnectionBuilder()
+    chatConnection = new signalR.HubConnectionBuilder()
         .withUrl('ws://localhost:5000/Chat', {
             skipNegotiation: true,
             transport: signalR.HttpTransportType.WebSockets,
             accessTokenFactory: () => { return store.state.auth_token }
-        })
+        }).build();
         //.configureLogging(signalR.LogLevel.Information) //TODO
         //.withAutomaticReconnect([0, 0, 10000])
 }
@@ -27,8 +27,8 @@ async function SetupNotificationConnection(callback) {
         accessTokenFactory: () => { return store.state.auth_token }
     })
     .configureLogging(signalR.LogLevel.Information) //TODO
-        //.withAutomaticReconnect([0, 0, 10000])
-        .build();
+    //.withAutomaticReconnect([0, 0, 10000])
+    .build();
 }
 
 
@@ -46,7 +46,7 @@ export async function WatchChat(callback) {
             //   "üzenetet szövege: " + message +
             //   "\n userId connection: " + userId
             // );
-
+            
             let data = {
                 "senderId": fromId,
                 "authorId": fromId,
@@ -73,7 +73,7 @@ export async function WatchChat(callback) {
                 console.log("starting connection....")
                 setInterval(async () => {
                     if (isLoggedin())
-                    await GetOnlineUser();
+                        await GetOnlineUser();
                     
                 }, 15000);
 
@@ -91,7 +91,7 @@ export async function WatchChat(callback) {
         }
     });
 }
-  
+
 async function GetOnlineUser() {
     if (chatConnection) {
         var userId = store.state.userId;
