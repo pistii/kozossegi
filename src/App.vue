@@ -12,6 +12,7 @@ import OverlayChat from './OverlayChat.vue';
 const initialize = () => {
     if (isLoggedin()) {
         loginSetup();
+        SetToDefault();
     }
 };
 

@@ -11,3 +11,8 @@ export async function loginSetup() {
     });
   }
   
+  //This method set back the values to its default state. Useful to clear data before data load
+export async function SetToDefault() {
+  store.state.notificationHub = [];
+  store.state.messageHub = [];
+}
