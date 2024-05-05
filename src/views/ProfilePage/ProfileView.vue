@@ -71,65 +71,16 @@
                     </v-row>
                 </div>
             </v-col>
-        </v-row>
-        <v-row justify="space-around">
-            <v-col cols="auto">
-           <v-overlay
-                v-model="shouldshowNewPasswordRestoreDialog"
-                contained
-                class="align-center justify-center"
-            >
-                <v-sheet class="pa-2">
-                    <h2 class="text-center">
-                        Sikeresen visszaállítottad a jelszavad, 
-                        <br>a továbbhaladás érdekében módosítsd
-                    </h2>
-                    <div class="px-6">
-                            <v-text-field
-                                v-model="password1" 
-                                autocomplete="new-password"
-                                :type="showPw ? 'text' : 'password'" 
-                                
-                                :append-inner-icon="showPw ? 'mdi-eye' : 'mdi-eye-off'"
-                                @click:append-inner="showPw = !showPw"
-                                density="compact"
-                                @keyup="userTypes()"
-                                >
-                            </v-text-field>
-                            <v-text-field 
-                            v-model="password2" 
-                            type="password"
-                            autocomplete="new-password"
-                            density="compact"
-                            >
-                            </v-text-field>
-                    </div>
-                    <!-- !passwordIsValid() -->
-                    <div v-if=" !passwordIsValid() && !isTyping"
-                    style="font-size: 12px;">
-                    A jelszónak 8-32 karakter hosszúnak kell lennie, és minimum 1 kisbetűt és 1 nagybetűt kell tartalmaznia
-                    </div>
-                    <div  class="text-right">
-                        <v-btn
-                            :color="
-                            passwordIsValid()
-                            ? 'success' : 'grey'"
-                            @click="changePass()"
-                        >
-                            Módosítom a jelszavam.
-                        </v-btn>
-                    </div>
-                </v-sheet>
-        </v-overlay>
+            <v-col >
+           
 
-        <overlay-loading :displayMsg="this.pwSuccessMsg" />
+        <overlay-loading :msg="null" />
 
         <overlay-complete-personal 
         :showCompleteDialog="this.remindUserOfUnfulfilledReg" 
         @closeModal="this.remindUserOfUnfulfilledReg = false;"/>
     </v-col>
-  </v-row>
-
+        </v-row>
     </v-container>
 </template>
 
@@ -150,7 +101,6 @@ import UserStore from '@/stores/UserStore';
 import { useRoute } from 'vue-router';
 import { ref } from 'vue';
 import router from '/src/router/index.js';
-import { mapGetters } from 'vuex';
 
 const route = ref(null);
 
@@ -176,10 +126,6 @@ export default {
         'overlay-complete-personal': OverlayCompletePersonal,
 
     },
-    computed: {
-        ...mapGetters(['shouldshowNewPasswordRestoreDialog']),
-        
-    },
     created() {
          route.value = useRoute()
          if (route.value.name == "profile") {
@@ -194,7 +140,6 @@ export default {
     mounted() {
         window.addEventListener('scroll', this.handleScroll);
         this.handleScroll(); 
-        UserStore.commit('setPasswordModifyDialog', false);
     },
     data() {
         return {
@@ -205,12 +150,9 @@ export default {
             publicity,
             rightPanelVisible,
             isElementVisible: false,
-            password1: '', pw1lastModify: null,
-            password2: '', pw2lastModify: null,
             showPw: false,
             isTyping: false,
             lastKeyPress: null,
-            pwSuccessMsg: 'A jelszó módosítása sikeresen megtörtént, egy pillanat...',
             remindUserOfUnfulfilledReg: false,
         }
     },
@@ -220,14 +162,14 @@ export default {
             if (id > 0)
             {
                 var response = await fetchData.methods.fetchData('GET', 'GetProfile', null, id, UserStore.getters.getUserId());
-                friends.value = response.friends.value
+                friends.value = response.friends
                 posts.value = response.posts.data
                 totalPages.value = response.posts.totalPages
                 user.value = response.personalInfo
                 publicity.value = response.publicityStatus
                 this.remindUserOfUnfulfilledReg = response.settings.remindUserOfUnfulfilledReg
                 UserStore.commit('setOnlineState', response.settings.isOnlineEnabled)
-                console.log(response.settings)
+                console.log(response)
             }
             this.setUserDataGlobally(response.personalInfo, response.friends.value);
         },
@@ -266,56 +208,6 @@ export default {
         addPost(post) {
             posts.value.unshift(post)
         },
-
-        //#region Forgot pasword and resetting....
-        passwordIsValid() {
-            var pwCorrect = this.password1 === this.password2 && 
-            this.password1.length >= 8 && this.password1.length <= 32 &&
-            this.password2.length >= 8 && this.password2.length <= 32 &&
-            /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/.test(this.password1) && /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,32}$/.test(this.password2);
-            
-            return pwCorrect;
-        },
-        async changePass() {
-            if (this.passwordIsValid()) {
-                var user = UserStore.getters.getUser();
-                user.password = this.password1; //Egy öröklött personal táblát vár
-                user.Password2 = this.password2;
-
-                await fetchData.methods.fetchData('POST', 'ModifyPw', user)
-                .then(resp => resp == "Jelszó módosítás megtörtént." ? 
-                this.passwordHaveBeenChanged(resp) : this.errorOnPasswordChange(resp));
-                
-            }
-        },
-        passwordHaveBeenChanged(data) {
-            UserStore.commit('setPasswordModifyDialog', false); //Disables the password requirement overlay
-            setTimeout(() => { //Show overlay and load page
-                UserStore.commit('setOverlayLoading', false);
-                location.reload();
-            }, 2000);
-            UserStore.commit('setOverlayLoading', true)
-        },
-        errorOnPasswordChange(data) {
-            //Gyakorlatilag a backend a két jelszót veti össze, de mivel már a frontenden ez megtörtént, szinte esélytelen hogy ez a metódus lefusson...
-        },
-        userTypes() {
-            this.handleTyping();          
-        },
-        handleTyping() {
-            this.isTyping = true;
-            this.lastKeyPressTime = Date.now();
-
-            // Ellenőrizzük, hogy az utolsó gépelés óta eltelt-e legalább 3 másodperc
-            setTimeout(() => {
-            if (Date.now() - this.lastKeyPressTime >= 3000) {
-                // Ha eltelt legalább 3 másodperc, akkor hajtsd végre az eseményt vagy a műveletet
-                console.log(this.isTyping)
-                this.isTyping = false;
-            }
-            }, 3000);
-        },
-        //#endregion
 
         async PutReminderOfUnfulfilledReg(days) {
             var dataToSend = {
