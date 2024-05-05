@@ -14,54 +14,35 @@
 				<v-img src="/src/assets/sed.gif">
 				</v-img>
 			</v-sheet>
+			
+			<v-sheet v-else class="scrollbar scroll_panel onlineUsersContainer" height="300">
+				<v-overlay 
+				v-model="loading"
+				class="align-center justify-center"
+				contained>
+				<v-progress-circular
+						color="primary"
+						indeterminate
+						size="64"
+						class="py-9 align-center justify-center"
+							>
+					</v-progress-circular>
+				</v-overlay>
+				<div 
+					v-for="item in notificationMenuItems" 
+					bg-color="blue-lighten-5">
 
-				<!-- create new friend request notification message-->
-				
-				<v-list-item 
-				@click="clickedOnNotification(item.notificationId, item.isNew)" 
-				:prependAvatar="getUserAvatar(item.notificationAvatar)" 
-				class="elevation-5 mx-1 text-truncate "
-				>
-				<template v-slot:append v-if="item.isNew">
-					<v-icon color="green"> mdi-circle-medium </v-icon> 
-				</template>
-
-				<div class="w-100">
-					<span class="text-start text-caption">
-						{{ this.formatDate(item.createdAt) }}
-					</span>
-					<span class="pl-2">
-						{{ item.notificationContent }}
-					</span>
-
-					<!--
-						FriendRequest = 0,
-						FriendRequestAccepted = 1,
-						Birthday = 2,
-						NewPost = 3
-					-->
+					<notificationCard :notification="item"/>
 				</div>
-					<v-list-item-title v-if="item.notificationType === 0" > <!--Csak akkor jelenik meg, ha barát kérelem történt--> 
-						
-						<v-sheet class="text-right" color="transparent">
-							<v-btn 
-							density="compact" 
-							color="deep-purple" 
-							class="px-1 my-1" 
-							size="small" 
-							height="20" 
-							@click="confirmRequest(item)" 
-							text="Megerősít"/>
-							<v-btn density="compact" 
-							class="ml-3 px-1"    
-							size="small"
-							height="20"
-							color="grey-lighten-2" 
-							@click="rejectRequest(item)" text="Elutasít"/>
-						</v-sheet>
-					</v-list-item-title>
-				</v-list-item>
-			</v-list>
+
+				<div>
+					
+					<Observer @intersect="loadMoreNotification" 
+					:options="{ threshold: 0.8 }" />
+				</div>
+				
+        	</v-sheet>
+
 		</v-menu>
 	</a>
 </template>
@@ -69,51 +50,92 @@
 <script>
 import { isLoggedin } from '@/utils/auth.js';
 import store from '@/stores/UserStore';
+import fetchData from '@/stores/server_routes.js';
+import { getUserAvatar, formatDate } from '@/utils/common';
+import { ref } from 'vue'
+import notificationCard from './notificationCard.vue'
+import Observer from '@/components/Observer.vue'
+
+//Notification Types:
+/*FriendRequest = 0,
+FriendRequestAccepted = 1,
+Birthday = 2,
+NewPost = 3
+*/
+
+var notfound = ref(false);
+var notificationMenuItems = ref([]);
+var currentPage = ref(1);
+var loading = ref(false);
 
 export default {
+	components: {
+		notificationCard,
+		Observer,
+	},
 	computed: {
 		newNotificationReceived() {
+			console.log("Értesítésk száma: " +  store.getters.getNotifications().length)
             return store.getters.getNotifications().length
         }
 	},
 	data() {
 		return {
-			notificationMenuItems: []
+			notfound,
+			notificationMenuItems,
+			currentPage,			
+			loading,
+
+			isLoggedin,
+			getUserAvatar, formatDate,
 		}
 	},
-	methods: {
-		async getNotifications() {
-            if (isLoggedin() && this.userId > 0) {
+	setup() {
+		const getNotifications = async () => {
+			var userId =  store.getters.getUserId();
+            if (isLoggedin() && userId > 0) {
                 try {
-                    await fetchData.methods.fetchData('GET', 'GetNotifications', null, this.userId)
-                    .then(resp => notificationMenuItems.value.push(resp));
+					loading.value = true;
+
+					var resp = await fetchData.methods.fetchData('GET', 'GetNotifications', null, userId, currentPage.value);
+					notificationMenuItems.value.length == 0 ? notificationMenuItems.value.push(resp) : notificationMenuItems.value.push(...resp);
+					console.log("loading more notification....");
+					loading.value = false;
+
                 } catch (error) {
-                    console.error('Error while getting notifications:', error);
+					console.log(error)
+					notfound.value = true;
                 }
             }
-        },
-        async clickedOnNotification(id, isNew) {
-            if (isNew)
-            {
-                //await fetchData.methods.fetchData('GET', 'NotificationRead', null, id).then(response => console.log(response));
-            }
-        },		
-        async confirmRequest(notification) { 
-            const postData = {
-                UserId: store.getters.getUserId(),
-                FriendId: notification.notificationFrom,
-                NotificationId: notification.notificationId
-            }
-            var resp = await fetchData.methods.fetchData('POST', 'AcceptFriendRequest', postData) 
+        }
 
-            var notificationToModify = notificationMenuItems.value[0].find(n => n.notificationId === resp.notificationId);
-            notificationToModify.notificationContent = resp.notificationContent;
-            notificationToModify.isNew = resp.isNew;
-        },
-        rejectRequest(notification) { //todo: test this function
-            console.log("reject")//todo
-            
-        },
-	}
+		const loadMoreNotification = () => {
+			getNotifications();
+			currentPage.value++;
+		}
+		return { 
+			loadMoreNotification,
+			getNotifications
+		}
+	},
 }
 </script>
+
+
+<style>
+.scroll_panel {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 78vh;
+    max-width: 32vw;
+}
+
+.onlineUsersContainer {
+    scroll-snap-type: y proximity;
+    overflow-y: scroll;
+    flex-direction: column;
+    display: flex;
+    padding-inline: 4px;
+}
+
+</style>
