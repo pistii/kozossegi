@@ -12,7 +12,10 @@ export default createStore({
     userId: 0,
     userIsOnline: null,
     auth_token: null,
-    messageHub: [],
+
+    messageHub: [], //Stored here because of the persisted state
+    notificationHub: [],
+
     userFriends: [],
     onlineFriends: [],
     overlayLoading: false,
@@ -27,15 +30,19 @@ export default createStore({
     setUserId(state, id) {
       state.userId = id;
     },
-    setOnlineState(state, online) {
+    setOnlineState(state, online) { //Az online/offline mód kezeléséhez
       console.log("user is now: " + online);
       state.userIsOnline = online;
     },
-    addSenderId(state, senderId) {
-      state.messageHub.push(senderId)
+    addSenderIdToMessageHub(state, senderId) { //Hozzáadja az új értesítések tömbjéhez az id-t, ha még nem tartalmazza
+      state.messageHub.push(senderId);
     },
+    addNewNotification(state, senderId) { //Hozzáadja az új értesítést, ha érkezik
+      state.notificationHub.push(senderId);
+    },
+
     removeElementFromArray(state, v) {
-      //state.messageHub = [] //Ha üzenetet kap tesztelni
+      state.messageHub = [] //Ha üzenetet kap tesztelni
       var index = state.messageHub.indexOf(v);
       if (index !== -1) {
         state.messageHub.splice(index, 1);
@@ -61,6 +68,10 @@ export default createStore({
     messageHubLen: (state) => () => {
       return state.messageHub.length;
     },
+    getNotifications: (state) => () => {
+      return state.notificationHub;
+    },
+
     getUserId: (state) => () => {
       return state.userId;
     },
