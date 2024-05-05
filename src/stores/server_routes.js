@@ -1,8 +1,8 @@
 import $, { error } from 'jquery'
-import store from '../stores/config.js';
+import store from '@/stores/config.js';
 import { ref } from "vue";
 import UserStore from './UserStore.js';
-import { getAuthToken } from '../utils/auth';
+import { getAuthToken } from '@/utils/auth';
 
 //import auth from '../utils/auth.js'
 //https://vuex.vuejs.org/guide/getters.html#method-style-access
@@ -57,7 +57,6 @@ export default{
 				if (path !== 'api/users/Signup/' && !path.includes("api/users/ForgotPw/") && !path.includes("checkVerCode")) {
 					console.log(path)
 					headers['Authorization'] = 'Bearer ' + AUTH_TOKEN_KEY 
-					
 				}
 				console.log(headers)
 
@@ -144,18 +143,5 @@ export async function PostImage(method, path, formData, param1 = null) {
 		});
 	});
 }
-
-// 			if (path == 'postComment' || 
-// 				path == 'register' || 
-// 				path == "PostChatMessage" ||
-// 				path == "PostFriendRequest" ||
-// 				path == 'CreateNewPost' ||
-// 				path == 'AddFriend'
-// 				) return await Post()
-
-// 			if (path == 'DeleteFriend') return await Delete()
-// 			if (path == "AcceptFriendRequest") return await Post()
-// 			if (path == 'NotificationRead') return await Post() //TODO: this requires tests
-
 
 export { BASE_URL }
