@@ -3,8 +3,6 @@ import { RouterView } from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import navBar from '@/components/navBar/navBar.vue'
-import OnlineFriendsView from '@/views/OnlineFriendsView.vue';
-import OverlayMessageDialogComponent from '@/views/OverlayMessageDialogComponent.vue'
 import '@mdi/font/css/materialdesignicons.css'
 import '@/variables.scss'
 import { loginSetup } from '@/utils/setup'
@@ -24,44 +22,6 @@ initialize();
 
 </script>
 
-<script>
-export default {
-    data() {
-        return {
-            renderComponent: true,
-            createNewChatRoom,
-        }
-    },
-    components: {
-        OnlineFriendsView,
-        OverlayMessageDialogComponent
-    },
-    computed: {
-        isLoggedin() {
-            this.forceUpdater();
-        },
-        getOpenedChatRooms() {
-            return MessageStore.getters.getOpenedChatRooms();
-        }
-    },
-    methods: {
-        async forceUpdater() {
-            this.renderComponent = false;
-
-            // Wait for the change to get flushed to the DOM
-            await this.$nextTick();
-
-            // Add the component back in
-            this.renderComponent = true;
-        },
-        async sendMessage(user) {
-            var createdChatRoom = await createNewChatRoom(user)
-            MessageStore.commit('setOpenedChatRooms', createdChatRoom);
-        }
-
-    }
-}
-</script>
 
 <template >
     <v-app class="bgcolor">
@@ -72,19 +32,16 @@ export default {
         </header>
 
         <v-row class="bgcolor">
-            <!--responsiveness: 
+            <!--reszponzív megjelenés: Ha szükség lenne a részegységek módosításához ez hasznos lehet: 
           https://vuetifyjs.com/en/styles/display/#visibility
         -->
-            <v-col class="d-none d-xl-block" cols="3">
+            <v-col class="d-none d-xl-block" cols="3"> <!--Bal oldali szegély--->
             </v-col>
             <v-col>
-                <RouterView :key="$route.fullPath" />
+                <RouterView :key="$route.fullPath" /> <!--Tartalmi rész-->
             </v-col>
-            <v-col class="d-none d-xl-block" cols="3" >
-                
+            <v-col class="d-none d-xl-block" cols="3" > <!--a jobb oldali szegély-->
             </v-col>
-
-           
         </v-row>
         <div class="bg-transparent" >
             <OverlayMessageDialogComponent v-if="getOpenedChatRooms.length>0"
