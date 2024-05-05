@@ -30,15 +30,18 @@ async function SetupNotificationConnection(callback) {
         //.withAutomaticReconnect([0, 0, 10000])
         .build();
 }
+
+
 export async function WatchChat(callback) {
     return new Promise(async (resolve) => {
-        if (!connection) {
+        if (!chatConnection) {
             SetupConnection();
+            if (isLoggedin) {
+                await chatConnection.start();
+            }
         }
 
-        connection.on("ReceiveMessage", async function (fromId, userId, message) {
-            console.log("watch from message")
-
+        chatConnection.on("ReceiveMessage", async function (fromId, userId, message) {
             // console.log("üzenet tőle: " + fromId,
             //   "üzenetet szövege: " + message +
             //   "\n userId connection: " + userId
@@ -55,22 +58,27 @@ export async function WatchChat(callback) {
             MessageStore.commit('sendNewMessage', data); //Storeban való tároláshoz
             eventBus.emit('new-message', data); //Értesíti a staybottom metódust hogy frissüljön a csetben
 
+            //Adds the user id if receives a new message and doesn't contains the id. This will trigger the new message received badge on the navBar 
+            if (!store.getters.hubContainsId(fromId)) {
+                store.commit('addSenderIdToMessageHub', fromId);
+            }
 
             callback(data);
             resolve(data);
         });
 
         try {
-            console.log(isLoggedin)
-            if (isLoggedin) {
+            //console.log(isLoggedin())
+            if (isLoggedin()) {
                 console.log("starting connection....")
-                await connection.start();
                 setInterval(async () => {
+                    if (isLoggedin())
                     await GetOnlineUser();
+                    
                 }, 15000);
 
                 // Eseményfigyelő az online barátok listájának fogadására
-                connection.on("ReceiveOnlineFriends", (onlineFriends) => {
+                chatConnection.on("ReceiveOnlineFriends", (onlineFriends) => {
                     //Elég csak akkor frissíteni a tárolót ha különbözőek az értékek, így nem lesz újra renderelve az online barátok tömb
                     if (!compareArrays(onlineFriends, store.state.onlineFriends)) {
                         console.log("Online barátok érkeztek:", onlineFriends);
