@@ -78,6 +78,7 @@ export default {
         // window.addEventListener("resize", this.truncateText);
     },
     beforeDestroy() {
+        eventBus.off('updateChatRoomContent')
         //window.removeEventListener("resize", this.truncateText);
     },
     watch: {
