@@ -7,6 +7,7 @@ export default createStore({
     chatRooms: [],
     chatContent: [],
     openedOverlayChats: [],
+    newMessages: [],
     currentRoomId: 0,
     currentPage: 1,
     totalPage: 1,
