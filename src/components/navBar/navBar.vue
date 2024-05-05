@@ -13,36 +13,10 @@
                 <v-col cols="5" md="3" class="pt-4 searchBarContainer" v-if="isLoggedin()">
                     <navSearch />
                 </v-col>
-                <!--
-                    https://vuetifyjs.com/en/components/menus/
-                    https://vuetifyjs.com/en/components/dialogs/
-                -->
-                <v-col style="text-align: righ; margin-right: 32px; margin-top: 4px; ">
-                    <div class="justify-end text-right" v-if="getUser">
-                        <v-menu transition="scroll-x-reverse-transition" >
-                            <template v-slot:activator="{ props }">
-                                <v-avatar v-bind="props" class="onHover">
-                                    <img :src="getUserAvatar(getUser.avatar)" height="40" /> <!--todo: get the avatar if user visits someone else's page-->
-                                </v-avatar>
-                            </template>
-                            <v-list>
-                                <v-list-item
-                                v-for="n in menuItems"
-                                :key="n"
-                                link
-                                >
-                                <template v-slot:prepend>
-                                    <v-icon>{{ n.icon }}</v-icon>
-                                    <v-list-item-title class="pl-3" v-text="n.title" @click="menuHandler(n)">
-                                    </v-list-item-title>
-                                </template>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
-                    </div>
-                </v-col>
+                <navMenu />
             </div>
         </v-row>
+
         <v-divider></v-divider>
     </nav>
     <SettingsComponent v-if="showSettingsOption" 
