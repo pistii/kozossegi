@@ -23,7 +23,7 @@ const routes = [
     {
         path: '/register',
         name: 'register',
-        component: () => import('@/components/SignUp.vue'),
+        component: () => import('@/views/LoginAndRegister/SignUp.vue'),
         meta: {
             allowAnonymous: true
         }
@@ -31,7 +31,7 @@ const routes = [
     {
         path: '/login', //TODO: Check valid token before reenters the site: https://stackoverflow.com/questions/46262094/checking-auth-token-valid-before-route-enter-in-vue-router
         name: 'login',
-        component: () => import('@/components/SignIn.vue'),
+        component: () => import('@/views/LoginAndRegister/SignIn.vue'),
         meta: {
             allowAnonymous: true
         },
