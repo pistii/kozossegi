@@ -1,10 +1,11 @@
 <template>
-    <v-container class="fill-height"
+    <Welcome />
+    <!-- <v-container class="fill-height"
         fluid>
         <v-row  align="center"
           justify="center">
-            <v-col cols="8" >
-                <v-img src="/src/assets/imgs/brandName.png"></v-img>
+            <v-col >
+                <v-img src="/src/assets/brand.gif"></v-img>
             </v-col>
             <v-col cols="1">
                 <v-btn class="ml-2 mb-2" color="primary" to="/login">
@@ -16,15 +17,17 @@
                 </v-btn>
             </v-col>
         </v-row>
-    </v-container>
+    </v-container> -->
 </template>
 
 <script>
-import SignUp from '/src/components/SignUp.vue';
-
+import SignUp from '@/views/LoginAndRegister/SignUp.vue';
+import Welcome from './Welcome.vue';
 export default {
     components: {
         SignUp,
+        Welcome,
+
     },
     data() {
         return {
