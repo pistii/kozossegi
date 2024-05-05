@@ -83,15 +83,13 @@ export async function WatchChat(callback) {
         }
     });
 }
-
-
   
 async function GetOnlineUser() {
-    if (connection) {
+    if (chatConnection) {
         var userId = store.state.userId;
-        var userFriends = store.state.userFriends;
         try {
-            await connection.invoke("ReceiveOnlineFriends", userId, userFriends);
+            console.log("Querying online friends....")
+            await chatConnection.invoke("ReceiveOnlineFriends", userId);
 
         } catch (error) {
             console.error("Hiba történt a szerveroldali metódus meghívása közben:", error);
