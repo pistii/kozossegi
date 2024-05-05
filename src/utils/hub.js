@@ -17,6 +17,17 @@ async function SetupConnection(callback) {
         })
         //.configureLogging(signalR.LogLevel.Information) //TODO
         //.withAutomaticReconnect([0, 0, 10000])
+}
+
+async function SetupNotificationConnection(callback) {
+    notificationConnection = new signalR.HubConnectionBuilder()
+    .withUrl('ws://localhost:5000/Notification', {
+        skipNegotiation: true,
+        transport: signalR.HttpTransportType.WebSockets,
+        accessTokenFactory: () => { return store.state.auth_token }
+    })
+    .configureLogging(signalR.LogLevel.Information) //TODO
+        //.withAutomaticReconnect([0, 0, 10000])
         .build();
 }
 export async function WatchChat(callback) {
