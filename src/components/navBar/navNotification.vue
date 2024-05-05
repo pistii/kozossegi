@@ -9,9 +9,11 @@
 					<v-icon v-bind="props"  @click="getNotifications()">mdi-bell</v-icon>
 				</v-badge>
 			</template>
-
-			<v-list  v-for="item in notificationMenuItems[0]" bg-color="blue-lighten-5">
-				<!-- {{ item }} -->
+			<v-sheet v-if="notfound" class="text-center pa-1">
+				Hoppá... Nem található tartalom
+				<v-img src="/src/assets/sed.gif">
+				</v-img>
+			</v-sheet>
 
 				<!-- create new friend request notification message-->
 				
