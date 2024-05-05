@@ -5,7 +5,8 @@ import eventBus from '../stores/eventBus';
 import { isLoggedin } from './auth';
 import { compareArrays } from './common';
 
-var connection;
+var chatConnection;
+var notificationConnection;
 
 async function SetupConnection(callback) {
     connection = new signalR.HubConnectionBuilder()
@@ -87,47 +88,43 @@ async function GetOnlineUser() {
     }
 }
 
-export const disconnect = () => {
-    if (connection) {
-        connection.stop();
-    }
-};
-
-
-
-/* 
-TODO:
-from profileView, although it was never called,
- I don't remember if it is a tested method, but should implement here for the notification
-ChatHubConnection() {
-
-            // Create a function that the hub can call to broadcast messages.
-            connection.on("ReceiveNotification", async function (userId, data) {
-                // Html encode display name and message.
-                
-                    const noti = {
-                    user: data.personId,
-                    fromUser: data.notificationFrom,
-                    content: data.notificationContent,
-                    createdAt: data.createdAt,
-                    isNew: data.isNew,
-                    type: data.notificationType,
-                    avatar: data.notificationAvatar
-                    }
-                    console.log(noti)
-                console.log("üzenetet kaptál tőle: " + data.notificationContent + "\n ConnectionId: " + userId)
-            });
-
-            try {
-                connection.start()
-                .then(async function () {
-                   console.log("receive connection successful " )
-            })
-            .catch(error => {
-                console.error(error.message);
-            });
-        } catch (err) {
-            console.error("hiba: " + err);
+export async function WatchNotification(callback) {
+    return new Promise(async (resolve) => {
+        if (!notificationConnection) {
+            SetupNotificationConnection();
+            console.log("starting notification connection....")
+            await notificationConnection.start();
         }
-        },
-*/
+
+        if (isLoggedin) {
+            //Feliratkozás a Notification Hubra
+            notificationConnection.on("ReceiveNotification", async (userId, data) => {
+                /*
+                createdAt: "2024-03-08T20:16:40.2895719+01:00"
+                isNew : true
+                notification : null
+                notificationAvatar :""
+                notificationContent :"seventh  test ma ünnepli a születésnapját."
+                notificationId : 0
+                notificationType : "Birthday"
+                receiverId: 1517
+                senderId : 1497
+                */
+                console.log("új értesítés: " + userId, data);
+                if (!store.getters.getNotifications().includes(data.senderId)) 
+                {//Egyelőre csak az annak az ellenőrzése, hogy az adott személy szerepel-e már az értesítésekben. 
+                    //TODO: Ha a content is ugyanaz mint ami már az értesítések között szerepel, nem szükséges belehelyezni, 
+                    store.commit('addNewNotification', data.senderId);
+                }
+            });
+        }
+    }
+)};
+
+export const disconnect = () => {
+    if (chatConnection) {
+        chatConnection.stop();
+    } 
+    if (notificationConnection) 
+        notificationConnection.stop();
+};
