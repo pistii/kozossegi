@@ -7,9 +7,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@/variables.scss'
 import { loginSetup } from '@/utils/setup'
 import { isLoggedin } from '@/utils/auth'
-import { createNewChatRoom, doesRoomExist } from '@/utils/MessageHelper.js'
-import MessageStore from '@/stores/MessageStore';
-import { getFullName, getUserAvatar, formatDate } from '@/utils/common';
+import OverlayChat from './OverlayChat.vue';
 
 const initialize = () => {
     if (isLoggedin()) {
@@ -28,6 +26,7 @@ initialize();
         <header class="bgcolor">
             <KeepAlive>
                 <navBar />
+                
             </KeepAlive>
         </header>
 
@@ -43,15 +42,7 @@ initialize();
             <v-col class="d-none d-xl-block" cols="3" > <!--a jobb oldali szegély-->
             </v-col>
         </v-row>
-        <div class="bg-transparent" >
-            <OverlayMessageDialogComponent v-if="getOpenedChatRooms.length>0"
-            class=" overlayChatPanel "
-            />
-
-            <div >
-                <OnlineFriendsView v-if="isLoggedin()"  />
-            </div>
-        </div>
+        <OverlayChat />
     </v-app>
 </template>
 
