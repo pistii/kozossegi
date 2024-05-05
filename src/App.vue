@@ -5,7 +5,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import navBar from '@/components/navBar/navBar.vue'
 import '@mdi/font/css/materialdesignicons.css'
 import '@/variables.scss'
-import { loginSetup } from '@/utils/setup'
+import { loginSetup, SetToDefault } from '@/utils/setup'
 import { isLoggedin } from '@/utils/auth'
 import OverlayChat from './OverlayChat.vue';
 
@@ -33,8 +33,8 @@ initialize();
 
         <v-row class="bgcolor">
             <!--reszponzív megjelenés: Ha szükség lenne a részegységek módosításához ez hasznos lehet: 
-          https://vuetifyjs.com/en/styles/display/#visibility
-        -->
+                https://vuetifyjs.com/en/styles/display/#visibility
+                -->
             <v-col class="d-none d-xl-block" cols="3"> <!--Bal oldali szegély--->
             </v-col>
             <v-col>
