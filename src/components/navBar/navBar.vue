@@ -19,107 +19,41 @@
 
         <v-divider></v-divider>
     </nav>
-    <SettingsComponent v-if="showSettingsOption" 
-    :showSettingsOption="this.showSettingsOption"/>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { useDisplay } from 'vuetify'
+
+const display  = ref(useDisplay())
+
+</script>
 
 <script >
 import TextAreaWithButton from '@/components/TextAreaWithButton.vue';
-import SettingsComponent from '@/components/SettingsComponent.vue';
-import brandName from './brandName.vue'
-import navButtons from './navButtons.vue'
-import navSearch from './navSearch.vue'
+import brandName from './brandName.vue';
+import navButtons from './navButtons.vue';
+import navSearch from './navSearch.vue';
+import navMenu from './navMenu.vue';
+import mobileView from './mobileView.vue';
 
-import { getUserAvatar } from '@/utils/common';
-
-import router from '@/router/index.js';
-import { isLoggedin, logoutUser } from '@/utils/auth.js';
-import store from '@/stores/UserStore';
-import MessageStore from '@/stores/MessageStore.js';
-import { formatDate } from '@/utils/common';
- 
+import { isLoggedin } from '@/utils/auth.js';
 
 export default {
-    props: {
-    },
-    
     components: {
         "text-area-with-button": TextAreaWithButton,
-        SettingsComponent,
         brandName,
         navButtons,
-        navSearch
+        navSearch,
+        mobileView,
+        navMenu
     },
-    computed: {
-        getUser() {
-            return store.state.user
-        },
-    }, 
+    
     data() {
         return {
-
-            id: '',
-            firstName: '',
-            middleName: '',
-            lastName: '',
-            Friends: '',
-            birthOfPlace: '',
-            
-            menuItems: [
-                { title: 'Help', icon: 'mdi-help' },
-                { title: 'Settings', icon: 'mdi-cog' },
-                { title: 'Logout', icon: 'mdi-logout' },
-            ],
-
-            showSettingsOption: false,
-            isLoggedin, formatDate, getUserAvatar,
-            userId: store.state.userId,
+            isLoggedin,
         }
     },
-    created() {
-        if (this.getUser != null) {
-            this.menuItems.unshift({
-                title: this.getUser.firstName + " " + this.getUser.lastName, 
-                icon:'mdi-home'
-            })
-        }
-    },
-    methods: {
-        
-        menuHandler(action) {
-            if (action.title == "Help") {
-                //Todo: help and help view
-            } else if (action.title == "Settings") {
-                this.SettingsOption();
-            } else if (action.title == "Logout") {
-                logoutUser();
-                store.dispatch('clearUserData')
-                store.dispatch('clearStore');
-                this.$router.push({name: 'home'});
-            } else {
-                router.push({name: 'profile'})
-                console.log("home");
-            }
-        },
-        SettingsOption() {
-            this.showSettingsOption = !this.showSettingsOption;
-        },
-        
-       
-        async getGeolcation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(this.showPosition);
-            } else { 
-                document.getElementById("demo").innerHTML =
-                "Geolocation is not supported by this browser.";
-            }
-        },
-        showPosition(position) {
-            console.log(
-            "Latitude: " + position.coords.latitude + "<br>" +
-            "Longitude: " + position.coords.longitude)
-        },
-    }
 }
 
 </script>
@@ -168,8 +102,4 @@ export default {
     margin-inline: 5px;
 }
 
-.userName {
-    text-decoration: none;
-    padding-inline: 15px;
-}
 </style>
