@@ -12,7 +12,7 @@
                         size="64"
                         class="py-9 align-center justify-center"
                     >
-                </v-progress-circular>
+                    </v-progress-circular>
                 </v-row>
                 <v-row class="pa-3">
                     {{ displayMsg }}
