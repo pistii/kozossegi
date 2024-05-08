@@ -94,8 +94,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     
-        if (to.name == 'login' && isLoggedin()) {
-            next({ name: 'myProfile' })
+        if ((to.name == 'home' || to.name == 'register') && isLoggedin()) {
+            next({ name: 'profile' })
         }
         else if (!to.meta.allowAnonymous && !isLoggedin()) {
             next({
