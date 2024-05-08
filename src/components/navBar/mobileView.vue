@@ -1,6 +1,6 @@
 <template>
         <div class="flex-container" > <!--öröklött osztály a navBar-ból-->
-            <div v-if="isLoggedin()">
+            <v-row v-if="isLoggedin()">
                 <v-col class="navBarMiddleIcons" > <!-- :style="{'width': 100% - txtAreaWidth + 'px'}" :cols="shouldExpandSearch ? '7' : '9'"-->
                     <navButtons  />
                 </v-col>
@@ -16,7 +16,7 @@
                 <v-col cols="1" sm="2" xs="3">
                     <navMenu />
                 </v-col>
-            </div>
+            </v-row>
         </div>
 </template>
 
