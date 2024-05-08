@@ -1,5 +1,5 @@
 <template>
-    <v-container>
+    <v-container style=" min-height:20rem">
         <v-sheet class="bg-info pa-2" rounded >
             <h4 color="indigo-lighten-5">
                 Ismerősök
@@ -14,16 +14,22 @@
             </div>
             <div  v-else >
                 <v-row no-gutters justify="space-evenly" >
-                    <v-col cols="3" xl="3" md="auto" class="mb-1 mx-1"  v-for="person in friends" :key="person">
+                    <v-col  v-for="person in friends" :key="person">
                         <v-hover v-slot="{ isHovering, props }">
-                            <v-card color="blue-darken-3 mb-3" max-width="150" min-width="135" class="text-center" v-bind="props" min-height="180" >
+                            <v-card 
+                            color="blue-darken-3" 
+                            max-width="100" 
+                            min-width="100" 
+                            min-height="100"
+                            class="text-center pa-1  mb-3" 
+                            v-bind="props"  >
                                 <v-img class=friendsAvatar :src="getUserAvatar(person.avatar)"></v-img>
                                 <v-card-item density="compact" class="friend_name" style="font-size: 75%;">
                                     {{ person.firstName + ' ' + person.lastName}}
                                 </v-card-item>
                                 <v-overlay :model-value="isHovering" contained scrim="#036358">
                                     <v-btn variant="flat" size="x-small" 
-                                    @click="returnUserId(person.id)">Profil megtekintése</v-btn>
+                                    @click="returnUserId(person.id)">Megtekint</v-btn>
                                 </v-overlay>
                             </v-card>
                         </v-hover>

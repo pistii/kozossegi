@@ -33,53 +33,51 @@
                         @click="PutReminderOfUnfulfilledReg(999)">Ne jelenjen meg többé</v-btn> 
                     </div>
                 </v-alert>
-                <div>
-                    <v-row>
-                        <v-col class="d-block d-md-block">
-                            <!--responsivity for the left panel-->
-                            <text-area-with-button @posts="addPost" />
-                            <center-content 
-                            :posts="posts" 
-                            :totalPages="totalPages"
-                            :key="posts"
-                            ></center-content>
-                        </v-col>
+                <v-row >
+                    <v-col class="ma-6">
+                        <!--responsivity for the left panel-->
+                        <text-area-with-button @posts="addPost" />
+                        <center-content 
+                        :posts="posts" 
+                        :totalPages="totalPages"
+                        :key="posts"
+                        ></center-content>
+                    </v-col>
 
-                        <!--responsivity for the right panel-->
-                        <v-col 
-                        style="background-color: transparent; " 
-                        v-show="this.rightPanelVisible"> 
+                    <!--responsivity for the right panel-->
+                    <v-col 
+                    class="d-none d-md-block"
+                    style="background-color: transparent; " 
+                    v-show="this.rightPanelVisible" > 
 
-                            <!--friends-component bg color equals vuetify blue-lighten-3-->
-                            <friends-component class="d-none d-md-block friendsComponent" 
-                            :friends="friends" 
-                            :key="friends"  
-                            style="background-color: #1e88e53a;
-                            border-radius: 15px" 
-                            @loadUserData="this.loadUserData"
-                            />
-                            <div class="pt-4">
-                                <Suspense>
-                                    <image-container-component  />
-                                </Suspense>
-                            </div>
-                            <div ref="myElement" 
-                                class="my-element" 
-                                :class="{ 'visible': this.isElementVisible }">
-                            </div>
-                        </v-col>
-                    </v-row>
-                </div>
+                        <!--friends-component bg color equals vuetify blue-lighten-3-->
+                        <friends-component 
+                        class=" friendsComponent" 
+                        :friends="friends" 
+                        :key="friends"  
+                        style="background-color: #1e88e53a;
+                        border-radius: 15px" 
+                        @loadUserData="this.loadUserData"
+                        />
+                        <div class="pt-4">
+                            <Suspense>
+                                <image-container-component  />
+                            </Suspense>
+                        </div>
+                        <div ref="myElement" 
+                            class="my-element" 
+                            :class="{ 'visible': this.isElementVisible }">
+                        </div>
+                    </v-col>
+                </v-row>
             </v-col>
             <v-col >
-           
+                <overlay-loading :msg="null" />
 
-        <overlay-loading :msg="null" />
-
-        <overlay-complete-personal 
-        :showCompleteDialog="this.remindUserOfUnfulfilledReg" 
-        @closeModal="this.remindUserOfUnfulfilledReg = false;"/>
-    </v-col>
+                <overlay-complete-personal 
+                :showCompleteDialog="this.remindUserOfUnfulfilledReg" 
+                @closeModal="this.remindUserOfUnfulfilledReg = false;"/>
+            </v-col>
         </v-row>
     </v-container>
 </template>
