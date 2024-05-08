@@ -5,7 +5,7 @@
 		</v-badge>
 	</RouterLink>
 	<RouterLink to="/searchPeople"  class="pa-1">
-		<v-badge content="1" color="error"  class="pa-1">
+		<v-badge color="transparent"  class="pa-1">
 			<v-icon class="pa-1">mdi-account-group</v-icon>
 		</v-badge>
 	</RouterLink>

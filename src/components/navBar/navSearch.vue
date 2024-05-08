@@ -1,5 +1,4 @@
 <template>
-	<div>
 		<v-text-field
 			class="mr-5"
 			v-model="searchText"  
@@ -20,7 +19,6 @@
 			</template>
 
 		</v-text-field>
-	</div>
 </template>
 
 <script setup>

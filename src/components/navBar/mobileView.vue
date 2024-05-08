@@ -1,19 +1,22 @@
 <template>
-        <div class="flex-container" > <!--öröklött osztály a navBar-ból-->
-            <v-row v-if="isLoggedin()">
+        <div class="flex-container pt-4" > <!--öröklött osztály a navBar-ból-->
+            <v-row v-if="isLoggedin()" >
+                <v-col cols="2" class="d-none d-sm-flex">
+
+                </v-col>
                 <v-col class="navBarMiddleIcons" > <!-- :style="{'width': 100% - txtAreaWidth + 'px'}" :cols="shouldExpandSearch ? '7' : '9'"-->
                     <navButtons  />
                 </v-col>
-                <v-col cols="1" class="px-2" >
+                <v-col class="px-2" cols="auto" >
                     <v-btn v-if="!this.shouldExpandSearch"
-                    class="pr-8" 
+                    class="pr-8"
                     @click="animateTxtBox()" 
                     variant="plain" 
                     icon="mdi-magnify" 
-                    style="font-size: 13px; padding: 18px"></v-btn>
+                    style="font-size: 13px; padding: 18px; float: right;"></v-btn>
                     <navSearch v-else  :style="{'width': txtAreaWidth + 'px'}" style="float: right;"/>
                 </v-col>
-                <v-col cols="1" sm="2" xs="3">
+                <v-col  cols="auto">
                     <navMenu />
                 </v-col>
             </v-row>

@@ -6,13 +6,12 @@
         <v-row v-else>
             <div class=" flex-container">
                 <brandName :isLoggedin="isLoggedin()" />
-                <v-col lg="6" md="5" sm="3" xs="2" class="navBarMiddleIcons col-sm-2"  v-if="isLoggedin()">
+                <v-col class="navBarMiddleIcons"  v-if="isLoggedin()">
                     <navButtons />
                 </v-col>
-
-                <v-col cols="5" md="3" class="pt-4 searchBarContainer" v-if="isLoggedin()">
+                <v-col class="pt-4 searchBarContainer" cols="auto" v-if="isLoggedin()">
                     <navSearch />
-                </v-col>
+                </v-col >
                 <navMenu />
             </div>
         </v-row>
@@ -72,7 +71,7 @@ export default {
 .searchBarContainer {
     position: relative;
     width: auto;
-    min-width: 200px;
+    min-width: 400px;
 }
 
 .searchBarContainer .v-btn {

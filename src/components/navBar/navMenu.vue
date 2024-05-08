@@ -1,5 +1,5 @@
 <template>
-    <v-col style="text-align: righ; margin-right: 32px; margin-top: 4px; ">
+    <v-col style="text-align: righ; margin-right: 32px; margin-top: 4px; " cols="auto">
         <div class="justify-end text-right" v-if="getUser">
             <v-menu transition="scroll-x-reverse-transition" >
                 <template v-slot:activator="{ props }">
