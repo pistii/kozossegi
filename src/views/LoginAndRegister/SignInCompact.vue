@@ -3,7 +3,7 @@
         <v-row  align="center" no-gutters
           justify="center">
             <v-col>
-                <v-card  class="signInContainer pa-6">
+                <v-card  class="signInContainer pa-6 justify-space-between">
                         <div v-if="forgotPassword">
                             <sendToEmail 
                             :email="email"
@@ -52,12 +52,16 @@
                                     Hibás email vagy jelszó.
                                 </div>
                             </v-card>
+                            <v-btn variant="compact" @click="register()">
+                                Register
+                            </v-btn>
                             <v-divider class="mt-6"></v-divider>
                             <v-card-actions class="justify-end">
                                 <v-btn color="green" variant="elevated" @click="login()">
                                     Login
                                 </v-btn>
                             </v-card-actions>
+
                         </div>
                 </v-card>
             </v-col>
@@ -72,6 +76,7 @@ import sendOTP from './_2_sendOTP.vue';
 import createNewPassword from '@/views/LoginAndRegister/_3_createNewPassword.vue';
 import login from './Login.vue';
 import { loginUser } from '@/utils/auth';
+import SignUp from '@/views/LoginAndRegister/SignUp.vue';
 
 /*
 Forgot password reset steps: 
@@ -89,7 +94,7 @@ export default {
         'create-new-password': createNewPassword,
         sendToEmail,
         sendOTP,
-        
+        SignUp,
     },
     data: () => ({
         forgotPassword: false,
@@ -133,7 +138,9 @@ export default {
                 console.log("Not found")
             }
         },
-
+        register() {
+            this.$router.push({name: 'register'});
+        }
     }
 }
 
@@ -148,8 +155,8 @@ export default {
 .signInContainer {
     border: 3px solid rgb(89, 126, 160);
     background-color: rgba(99, 132, 160, 0.458);
-    min-height: 400px;
-    min-width: 300px;
+    min-height: 340px;
+    min-width: 400px;
 }
 
 .slide-fade-enter-active {

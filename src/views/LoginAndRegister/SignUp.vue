@@ -1,9 +1,8 @@
 
 <template>
     <v-container fluid class="fill-height">
-        <v-col>
             <v-row class="justify-center">
-                <v-card width="600" class="bg-blue-grey-lighten-5"  >
+                <v-card width="800" class="bg-blue-grey-lighten-5"  >
                     <v-container  :class="{'bg-cyan-lighten-4' : registeringPbar}" >
                     <v-card-title>
                         <span class="text-h5"></span>
@@ -67,8 +66,6 @@
                 </v-card>
                 
             </v-row>
-            
-        </v-col>
     </v-container>
 </template>
 
