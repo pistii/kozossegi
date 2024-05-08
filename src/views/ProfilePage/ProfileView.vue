@@ -34,7 +34,7 @@
                     </div>
                 </v-alert>
                 <v-row >
-                    <v-col class="ma-6">
+                    <v-col>
                         <!--responsivity for the left panel-->
                         <text-area-with-button @posts="addPost" />
                         <center-content 

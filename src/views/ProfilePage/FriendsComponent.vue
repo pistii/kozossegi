@@ -23,7 +23,7 @@
                             min-height="100"
                             class="text-center pa-1  mb-3" 
                             v-bind="props"  >
-                                <v-img class=friendsAvatar :src="getUserAvatar(person.avatar)"></v-img>
+                                <v-img class="friendsAvatar" :src="getUserAvatar(person.avatar)"></v-img>
                                 <v-card-item density="compact" class="friend_name" style="font-size: 75%;">
                                     {{ person.firstName + ' ' + person.lastName}}
                                 </v-card-item>
@@ -75,11 +75,11 @@ export default {
 </script>
 
 <style>
-.friendsAvatar{
+.friendsAvatar {
     width: 100%;
     height: fit-content;
     min-width: 100%;
-
+    border-radius: 8%;
 }
 
 .friend_name {
