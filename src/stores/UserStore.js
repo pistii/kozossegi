@@ -19,6 +19,8 @@ export default createStore({
     userFriends: [],
     onlineFriends: [],
     overlayLoading: false,
+
+    overlayMessageFriends: true //True if expanded the overlay panel, false if minimized
   },
   mutations: {
     setUser(state, user) {
@@ -57,6 +59,9 @@ export default createStore({
     setOverlayLoading(state, param) {
       state.overlayLoading = param;
     },
+    setOverlayMessageFriendsPanelTo(state, value) { //Sets the overlay message panel to visible or minimized
+      state.overlayMessageFriends = value;
+    },
     clearStore() {
       ls.clear();
     },
@@ -91,6 +96,10 @@ export default createStore({
     getoverlayLoading: (state) => () => {
       return state.overlayLoading;
     },
+
+    getOverlayMessageFriendsState: (state) => () => { //Returns the state of the overlay message friends, if it is open, or minimized
+      return state.overlayMessageFriends;
+    } 
     
   },
   plugins: [createPersistedState({

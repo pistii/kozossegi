@@ -1,7 +1,7 @@
 <template>
     <Transition name="slide-down">
-        <div class="online_users_main" v-if="UserStore.state.openClose_MessagePanel && isLoggedin()">
-            <v-sheet class="text-center onHover" @click="UserStore.state.openClose_MessagePanel = false" color="green" >
+        <div class="online_users_main" v-if="overlayOnlineFriendsMessagePanelIsOpen()">
+            <v-sheet class="text-center onHover" @click="this.shouldShowOverlayOnlineFriendMessagePanel(false)" color="green" >
                 Online ({{ getCurrentlyOnlineUsers }})
             </v-sheet>
             <v-sheet  height="190dvh" class="scrollbar scroll_panel">
@@ -32,7 +32,7 @@
             </v-sheet>
             <div class="bg-blue-darken-2 px-2">
                 <v-text-field class=" pt-2" density="compact"
- placeholder="Start searching..."
+                    placeholder="Start searching..."
                     v-model="searchTxt" 
                     >
                 </v-text-field>
@@ -40,7 +40,7 @@
         </div>
         <div v-else 
         class="online_users_main bottom_messagePanel_small" 
-        @click="UserStore.state.openClose_MessagePanel = !UserStore.state.openClose_MessagePanel">
+        @click="shouldShowOverlayOnlineFriendMessagePanel(true)">
             <v-sheet 
             class="text-center onHover" 
             color="green" >
@@ -82,7 +82,6 @@ export default {
             if (usersToReturn <= usersQtToShow) 
             {
                 var randomUsers = this.sortByStatusAndName(UserStore.getters.getUserFriends(), UserStore.getters.getOnlineUsers());
-                //console.log("algoritmikus user választva: " + randomUsers);
                 usersToReturn.push(...randomUsers);
             }
             else { //Ha több az online user mint a megjelenítendő maximális mennyiség, akkor feldaraboljuk őket
@@ -107,7 +106,8 @@ export default {
         },
         
         userQtyToShow() { //30 és 100 között ad vissza egy értéket, vagy ha a user barátai kevesebb mint a MIN_USERS_TO_RETURN, akkor a barát lista mennyiségét
-            let TOTAL_USER = UserStore.getters.getUserFriends().length;
+            let TOTAL_USER = UserStore.getters.getUserFriends();
+            TOTAL_USER = TOTAL_USER === typeof(undefined) ? 0 : TOTAL_USER;
             let userNumToReturn = RANDOM_USER_TO_RETURN >
             //Ha a random több mint a teljes user mennyiség
             TOTAL_USER ? 
@@ -174,6 +174,15 @@ export default {
             return mergedUsers;
             
         },
+        overlayOnlineFriendsMessagePanelIsOpen() {
+            if (isLoggedin()) {
+                return UserStore.getters.getOverlayMessageFriendsState();
+            }
+            return false;
+        },
+        shouldShowOverlayOnlineFriendMessagePanel(expand) {
+            UserStore.commit('setOverlayMessageFriendsPanelTo', expand);
+        }
     }
 }
 </script>
@@ -207,7 +216,7 @@ export default {
     max-width: 32vw;
 }
 
-.messageBox {
+/* .overlayMessageBox {
     scroll-snap-type: y proximity;
     overflow-y: scroll;
     flex-direction: column;
@@ -219,7 +228,7 @@ export default {
     display: inline-block;
     flex-direction: column;
     border-radius: 8px;
-}
+} */
 
 div.v-card-item, div.v-list-item {
     padding: 3px;
