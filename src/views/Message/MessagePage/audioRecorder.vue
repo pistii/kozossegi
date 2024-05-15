@@ -1,95 +1,94 @@
 <template>
     <div>
-        <!--https://fireship.io/courses/vue/storage-record-voice/
-            https://www.tutorialspoint.com/how-to-record-and-play-audio-in-javascript
-            https://picovoice.ai/blog/how-to-record-audio-from-a-web-browser/
-        -->
         <v-tooltip top>
             <template v-slot:activator="{ on }">
-                <v-btn v-if="!recorder" dark v-on="on" @click="record()">
+                <v-btn v-if="!recorder" dark v-bind="on" @click="record()">
                     <v-icon class="button is-info">mdi-play</v-icon>
                 </v-btn>
-                <v-btn v-else @click="stop()" dark v-on="on">
+                <v-btn v-else @click="stop()" dark v-bind="on">
                     <v-icon>mdi-pause</v-icon>
                 </v-btn>
-                <v-btn dark v-on="on">
+                <v-btn dark v-bind="on">
                     <v-icon>mdi-restart</v-icon>
                 </v-btn>
-                <audioPlayer v-if="newAudio" :audio="this.newAudioURL" />
 
             </template>
         </v-tooltip>
     </div>
+
+    <snackBar :errorMessage="this.errorMessage" v-if="this.errorMessage"/>
 </template>
 
 <script>
-import { mdiPlay } from '@mdi/js'
-import { mdiPlayPause } from '@mdi/js'
-import { mdiPause } from '@mdi/js'
-import { mdiRestart } from '@mdi/js'
-import { mdiMicrophone } from '@mdi/js'
-import audioPlayer from './audioPlayer.vue'
+import snackBar from '@/components/snackBar.vue';
+
+const recordedChunks = [];
+
 
 export default {
+    components: {
+        snackBar,
+    },
     props: {
         menuOpen: Boolean,
     },
-    components: {
-        audioPlayer,
-    },
     data() {
         return {
-            menuOpen: false,
-            newMessageText: '',
-            loading: false,
-            messages: [],
             newAudio: null,
             recorder: null,
-            mdiMicrophone: mdiMicrophone,
-            mdiPlay: mdiPlay,
-            mdiPlayPause: mdiPlayPause,
-            mdiPause: mdiPause,
-            mdiRestart: mdiRestart,
-            show: false
-        }
-    },
-    computed: {
-        newAudioURL() {
-            return URL.createObjectURL(this.newAudio);
+            show: false,
+            errorMessage: null,
+            errorMessageDescription: null,
         }
     },
     methods: {
         async record() {
+            if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+                this.errorMessage = "Feature is not supported by browser";
+                return Promise.reject(new Error("Feature is not supported by browser")
+            
+            );
+            }
             this.newAudio = null;
+            navigator.mediaDevices.getUserMedia({ audio: true })
+             .then(stream => {
+            
+                this.recorder = new MediaRecorder(stream);
 
-            const stream = await navigator.mediaDevices.getUserMedia({
-                audio: true
-            });
+                this.recorder.addEventListener("dataavailable", e => {
+                    if (e.data.size > 0) {
+                        recordedChunks.push(e.data);
+                    }
+                });
 
-            const options = { mimeType: "audio/webm" };
-            const recordedChunks = [];
-            this.recorder = new MediaRecorder(stream, options);
-
-            this.recorder.addEventListener("dataavailable", e => {
-                if (e.data.size > 0) {
-                    recordedChunks.push(e.data);
+                this.recorder.start();
+            }).catch(error => {
+                switch (error.name) {
+                    case 'NotAllowedError': 
+                        this.errorMessage = "No microphone permission granted.";
+                        this.errorMessageDescription = "Please enable microphone in order to start voice recording..";
+                    case "NotReadableError":
+                        this.errorMessage = "A problem occured with the file.";
+                        this.errorMessageDescription = "Please try again.";
+                    case "NotFoundError":
+                        this.errorMessage = "Recording not found";
+                        this.errorMessageDescription = "Please try again.";
                 }
-            });
-
-            this.recorder.addEventListener("stop", () => {
-                this.newAudio = new Blob(recordedChunks);
-            });
-
-            this.recorder.start();
+            })
         },
+
         async stop() {
+            
+            this.recorder.addEventListener("stop", () => {
+                const blobObj = new Blob(recordedChunks, {'type': 'audio/mp3'} );
+                const audioUrl = URL.createObjectURL(blobObj);
+
+                this.$emit('newAudioCreated', audioUrl);
+            });
             this.recorder.stop();
             this.recorder = null;
         },
     },
-    created() {
-        this.$emit('newAudioURL');
-    }
 }
 </script>
 
