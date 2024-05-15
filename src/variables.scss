@@ -1,0 +1,12 @@
+html {
+    font-size: 90%;
+    @media only screen and (min-width: 600px) {
+        font-size: 34%;
+    }
+    @media only screen and (min-width: 1000px) {
+        font-size: 38%;
+    }
+    @media only screen and (min-width: 1200px) {
+        font-size: 30%;
+    }
+}
