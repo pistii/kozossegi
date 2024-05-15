@@ -81,9 +81,9 @@ export default createStore({
     },
   },
   actions: {
-    //Removes the chatroom from the overlay which has been clicked in order to close
+    //Removes the chatroom from the overlay
     removeOpenedChatRoom({commit}, payload) {
-      const pid = payload.personId;
+      const pid = payload;
       const index = this.state.openedOverlayChats.findIndex(p => p.id === pid);
       if (index !== -1) {
         this.state.openedOverlayChats.splice(index, 1);

@@ -56,7 +56,7 @@ export default{
 				
 				if (path !== 'api/users/Signup/' && !path.includes("api/users/ForgotPw/") && !path.includes("checkVerCode")) {
 					console.log(path)
-					headers['Authorization'] = 'Bearer ' + AUTH_TOKEN_KEY 
+					headers['Authorization'] = 'Bearer ' + AUTH_TOKEN_KEY
 				}
 				console.log(headers)
 

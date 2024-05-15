@@ -1,5 +1,5 @@
 <template>
-		<div class="rel">
+		<div class="rel pl-6 pb-12">
 			<div class="emoji_picker">
 				<div class="picker_container ">
 					<div v-for="category in categories" :key="`category_${category}`" >

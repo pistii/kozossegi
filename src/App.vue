@@ -7,7 +7,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@/variables.scss'
 import { loginSetup, SetToDefault } from '@/utils/setup'
 import { isLoggedin } from '@/utils/auth'
-import OverlayChat from '@/components/OverlayChat.vue';
+import OverlayChat from '@/components/ChatCard/OverlayChat.vue';
 
 const initialize = () => {
     if (isLoggedin()) {

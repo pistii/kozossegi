@@ -3,7 +3,7 @@
 		<v-menu :close-on-content-click="false">
 			<template v-slot:activator="{ on }">
 				<audio controls>
-					<source :src="audio" type="audio/webm">
+					<source :src="audio">
 				</audio>
 			</template>
 			<v-card>

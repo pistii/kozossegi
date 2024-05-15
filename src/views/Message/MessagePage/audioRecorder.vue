@@ -21,6 +21,7 @@
 
 <script>
 import snackBar from '@/components/snackBar.vue';
+import eventBus from '@/stores/eventBus';
 
 const recordedChunks = [];
 
@@ -83,7 +84,7 @@ export default {
                 const blobObj = new Blob(recordedChunks, {'type': 'audio/mp3'} );
                 const audioUrl = URL.createObjectURL(blobObj);
 
-                this.$emit('newAudioCreated', audioUrl);
+                eventBus.emit('newAudioCreated', audioUrl);
             });
             this.recorder.stop();
             this.recorder = null;

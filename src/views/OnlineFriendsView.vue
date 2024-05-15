@@ -146,7 +146,7 @@ export default {
             }
             MessageStore.commit('setPartner', user);
             MessageStore.commit('setPartnerId', user.id);
-            console.log(user)
+            //console.log(user)
             eventBus.emit('invoke-message-dialog-panel', false);
         },
         sortByStatusAndName(allUser, onlineUser) {

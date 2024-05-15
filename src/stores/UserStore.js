@@ -33,7 +33,6 @@ export default createStore({
       state.userId = id;
     },
     setOnlineState(state, online) { //Az online/offline mód kezeléséhez
-      console.log("user is now: " + online);
       state.userIsOnline = online;
     },
     addSenderIdToMessageHub(state, senderId) { //Hozzáadja az új értesítések tömbjéhez az id-t, ha még nem tartalmazza
