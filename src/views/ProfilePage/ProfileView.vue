@@ -169,7 +169,7 @@ export default {
                 UserStore.commit('setOnlineState', response.settings.isOnlineEnabled)
                 console.log(response)
             }
-            this.setUserDataGlobally(response.personalInfo, response.friends.value);
+            this.setUserDataGlobally(response.personalInfo, response.friends);
         },
         setUserDataGlobally(user, friends) {
             UserStore.commit('setUser', user)

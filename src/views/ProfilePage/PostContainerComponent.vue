@@ -1,13 +1,16 @@
 <!-- The container for a single post and the comments section -->
 <template>
+    <!-- <SmartCard /> -->
     <v-card class="mx-auto elevation-6 bg-indigo-lighten-5 my-5"  >
         <v-card-item style="min-width:200px">
             <v-sheet class="d-flex mb-6" color="transparent">
-                <v-avatar>
-                    <v-img :src="getUserAvatar(postContent.authorAvatar)" />
+                <v-avatar class="ma-2 elevation-15 avatar_border">
+                    <img  
+                    height="40" 
+                    :src="getUserAvatar(postContent.authorAvatar)" />
                 </v-avatar>
                 <!-- {{ postContent }} -->
-                <span>
+                <span class="py-2">
                     <RouterLink :to="{ path: '/profile=' + postContent.authorId }"
                         class="authorName px-4"
                         >
@@ -18,7 +21,7 @@
                         {{ formatDate(postContent.dateOfPost) }}
                     </span>
                 </span>
-
+                
                 <v-menu transition="v-fade-transition">
                     <template v-slot:activator="{ props }">
                         <v-icon v-bind="props" icon="mdi-dots-vertical" class="ml-auto"></v-icon>
@@ -40,6 +43,7 @@
                 </v-menu>
             </v-sheet>
 
+            <v-divider></v-divider>
             <span v-if="postContent.mediaContents[0] != null" class="justify-center">
                 <!--<v-img :src="getFilePath(postContent.mediaContents[0].fileName)"
                     style="max-height: 400px;" 
@@ -99,6 +103,7 @@
                     </template>
                 </v-tooltip>                    
             </v-card-actions>
+            <v-divider></v-divider>
 
             <div>
                 <v-btn class="pb-0 mb-0" variant="plain" color="primary"
@@ -155,9 +160,10 @@
 import store from '../../stores/UserStore';
 import { ref } from 'vue';
 import PostCommentComponent from './PostCommentComponent.vue'
+import SmartCard from '@/components/SmartCard.vue';
+
 import fetchData, { PostImage } from '../../stores/server_routes';
 import { formatDate, getUserAvatar } from '@/utils/common.js'
-
 var defaultText = ref("");
 
 export default {
@@ -167,6 +173,7 @@ export default {
     },
     components: {
             PostCommentComponent: PostCommentComponent,
+            SmartCard
         },
         data() {
             return {            
@@ -277,5 +284,10 @@ export default {
     color: #528cbbef; 
     font-family:'Franklin Gothic Medium'; 
     text-decoration: none;
+}
+
+.avatar_border {
+    margin: 4px;
+    border: 1px solid;
 }
 </style>

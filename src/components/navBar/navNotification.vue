@@ -122,7 +122,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .scroll_panel {
     overflow-y: auto;
     overflow-x: hidden;

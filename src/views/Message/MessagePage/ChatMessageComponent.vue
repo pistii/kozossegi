@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ 'ma-2 d-flex justify-end' : msg.authorId === userId}"
+    <div :class="{ 'mx-2 d-flex justify-end' : msg.authorId === userId}"
         class="ma-2 d-flex" > 
         <v-sheet :class="{ 'ma-2 pa-3 d-flex bg-green rounded wrapContent' : msg.authorId === userId}"
         class="ma-2 pa-3 d-flex bg-blue rounded wrapContent" @click="this.expandDate = !this.expandDate">

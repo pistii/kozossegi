@@ -7,7 +7,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import '@/variables.scss'
 import { loginSetup, SetToDefault } from '@/utils/setup'
 import { isLoggedin } from '@/utils/auth'
-import OverlayChat from './OverlayChat.vue';
+import OverlayChat from '@/components/OverlayChat.vue';
 
 const initialize = () => {
     if (isLoggedin()) {
@@ -52,19 +52,6 @@ initialize();
 .bgcolor {
     background: linear-gradient(to bottom, rgba(53, 106, 160, 1) 0%, rgba(53, 106, 160, 1) 100%);
 }
-
-.overlayChatPanel {
-    position: fixed;
-    bottom: 0;
-    min-width: 150px;
-    max-width: 100%;
-    background-color: rgba(26, 25, 25, 0.368);
-    text-align: left;
-    width: 80%;
-    height: 400px;
-    right: 20%;
-}
-
 
  /*
 //Set back to default
