@@ -71,7 +71,7 @@ import { ref, nextTick, onMounted } from 'vue';
 import eventBus from '@/stores/eventBus';
 
 import fetchData from '@/stores/server_routes';
-import composable from './composable.vue'
+import composable from './audioVisualizer.vue';
 
 //import EmojiPicker from '@/zaichaopan/emoji-picker';
 
