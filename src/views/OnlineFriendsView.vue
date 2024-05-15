@@ -4,7 +4,7 @@
             <v-sheet class="text-center onHover" @click="this.shouldShowOverlayOnlineFriendMessagePanel(false)" color="green" >
                 Online ({{ getCurrentlyOnlineUsers }})
             </v-sheet>
-            <v-sheet  height="190dvh" class="scrollbar scroll_panel">
+            <v-sheet  max-height="190dvh" class="scrollbar scroll_panel">
                 <v-virtual-scroll  v-if="usersToShow.length > 0"
                     :items="usersToShow">
                     <template v-slot:default="{ item }">
@@ -14,6 +14,7 @@
                         @click="sendMessageToUser(item)">
                             <v-list-item-title>
                                 <v-card 
+                                style="height: 35px;"
                                 class="onHover mx-auto my-1 bg-blue-grey-lighten-5 pa-1" 
                                 :title="getFullName(item.firstName, item.middleName, item.lastName) ">
                                     <template v-slot:prepend >
@@ -56,8 +57,6 @@ import MessageStore from '@/stores/MessageStore'
 import {getUserAvatar, getFullName } from '@/utils/common';
 import eventBus from '@/stores/eventBus';
 
-import OverlayMessageDialogComponent from './OverlayMessageDialogComponent.vue'
-
 import { ref } from 'vue';
 import { isLoggedin } from '../utils/auth';
 
@@ -69,9 +68,6 @@ const MIN_USERS_TO_RETURN = 30;
 const MAX_USERS_TO_RETURN = Math.floor(Math.random() * MAX_ONLINE_USERS); //0 és 100 között ad vissza egy értéket
 const RANDOM_USER_TO_RETURN = MAX_USERS_TO_RETURN + MIN_USERS_TO_RETURN; //30 és 100 között ad vissza értéket
 export default {
-    components: {
-        OverlayMessageDialogComponent
-    },
     computed: {
         
         usersToShow() { //TODO: Test the method with more than 30, and 100 users
@@ -192,7 +188,9 @@ export default {
     position: fixed; 
     right: 0;
     bottom: 0;
-    min-width: 11vw;
+    width: 200px;
+    max-width: 300px;
+    
 }
 
 .onlineUsersContainer {
@@ -207,13 +205,12 @@ export default {
     background-color: rgba(7, 14, 22, 0.623);
     margin-left: 30px;
     height: 3vh;
+    min-width: 250px;
 }
 
 .scroll_panel {
     overflow-y: auto;
-    overflow-x: hidden;
     max-height: 78vh;
-    max-width: 32vw;
 }
 
 /* .overlayMessageBox {
