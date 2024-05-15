@@ -13,7 +13,7 @@
                     </div>
                 </div>
             </span>
-            
+
             <!--main tab-->
             <v-btn 
             @click="minimalizeWindow()" 
@@ -26,7 +26,7 @@
                     mdi-square-outline
                 </v-icon>
             </v-btn>
-            <v-btn class="mr-3" @click="WindowHandler(true)" variant="plain" size="x-small">
+            <v-btn class="mr-3" @click="WindowHandler()" variant="plain" size="x-small">
                 <v-icon>
                     mdi-close-circle
                 </v-icon>
@@ -47,7 +47,6 @@ export default {
             containerHeight: this.DEFAULT_CONTAINER_HEIGHT, // Kezdeti érték
             
             minimalized: false,
-            closed: false,
             
             tabVisible: true,
             getFullName,
@@ -75,14 +74,8 @@ export default {
                 this.$emit('setChatContainerHeight', this.containerHeight);
             }
         },
-        WindowHandler(shouldClose) {
-            console.log(shouldClose)
-            if (shouldClose) {
-                this.closed = true;
-            }
-            else if (this.closed = true) {
-                this.closed = false;
-            }
+        WindowHandler() {
+            MessageStore.dispatch('removeOpenedChatRoom', MessageStore.getters.getPartnerId());
             
         }
     }
@@ -101,6 +94,14 @@ export default {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+
+.panelNavHeader {
+    border-radius: 30px;
+    max-height: 25px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 </style>

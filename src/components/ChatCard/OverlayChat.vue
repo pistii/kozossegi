@@ -1,6 +1,6 @@
 <template>
     <div v-if="isLoggedin()">
-        <OverlayMessageDialogComponent v-if="getOpenedChatRooms.length>0"
+        <ChatCardWidget v-if="getOpenedChatRooms.length>0"
         class=" overlayChatPanel "
         />
         <div >
@@ -11,7 +11,7 @@
 
 <script>
 import OnlineFriendsView from '@/views/OnlineFriendsView.vue';
-import OverlayMessageDialogComponent from '@/components/ChatCardWidget.vue'
+import ChatCardWidget from './ChatCardWidget.vue'
 import { isLoggedin } from '@/utils/auth'
 import { createNewChatRoom } from '@/utils/MessageHelper.js'
 import MessageStore from '@/stores/MessageStore';
@@ -26,7 +26,7 @@ export default {
     },
     components: {
         OnlineFriendsView,
-        OverlayMessageDialogComponent
+        ChatCardWidget
     },
     computed: {
         getOpenedChatRooms() {
@@ -38,7 +38,6 @@ export default {
             var createdChatRoom = await createNewChatRoom(user)
             MessageStore.commit('setOpenedChatRooms', createdChatRoom);
         }
-
     }
 }
 </script>
