@@ -9,6 +9,8 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import UserStore from './stores/UserStore'
 
+import { AVPlugin } from "vue-audio-visual";
+
 const app = createApp(App);
 
 const vuetify = createVuetify({
@@ -20,4 +22,5 @@ app
 .use(UserStore)
 .use(vuetify)
 .use(router)
+.use(AVPlugin)
 .mount('#app');
