@@ -13,6 +13,9 @@ import emojiJsonData from '@/emojis-data.json'
 import eventBus from '@/stores/eventBus';
 
 export default {
+    props: {
+        activeMenu: String
+    },
     emits: ['selectedEmoji'],
     data() {
         return {
@@ -28,7 +31,8 @@ export default {
     },
     methods: {
         onEmojiPicker() {
-            this.EmojiVisible = !this.EmojiVisible
+            if (this.activeMenu == 'text')
+                this.EmojiVisible = !this.EmojiVisible
         },
         handleEmojiClick(emoji) {
             eventBus.emit('selectedEmoji', emoji); //Notify the Card Footer component about the added emoji
