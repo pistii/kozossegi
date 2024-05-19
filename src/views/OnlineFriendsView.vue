@@ -9,24 +9,22 @@
                     :items="usersToShow">
                     <template v-slot:default="{ item }">
                         <v-list-item 
+                        class="onHover bg-blue-grey-lighten-5"
                         :value="item" 
                         color="primary" 
                         @click="sendMessageToUser(item)">
-                            <v-list-item-title>
-                                <v-card 
-                                style="height: 35px;"
-                                class="onHover mx-auto my-1 bg-blue-grey-lighten-5 pa-1" 
-                                :title="getFullName(item.firstName, item.middleName, item.lastName) ">
-                                    <template v-slot:prepend >
-                                        <v-avatar size="30">
-                                            <img :src="getUserAvatar(item.avatar)"  height="40" />
-                                        </v-avatar>            
-                                    </template>
-                                    <template v-slot:append>
-                                        <v-icon icon="mdi-circle-medium" :color="item.isOnline ? 'success' : 'red'"></v-icon>
-                                    </template>
-                                </v-card>
+                            <template v-slot:prepend >
+                                <v-avatar size="30">
+                                    <img :src="getUserAvatar(item.avatar)"  height="40" />
+                                </v-avatar>            
+                            </template>
+                            <v-list-item-title style="font-size: 14px">
+                                {{ getFullName(item.firstName, item.middleName, item.lastName) }}
                             </v-list-item-title>
+                            
+                            <template v-slot:append>
+                                <v-icon icon="mdi-circle-medium" :color="item.isOnline ? 'success' : 'red'"></v-icon>
+                            </template>
                         </v-list-item>
                     </template>
                 </v-virtual-scroll>
