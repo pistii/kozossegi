@@ -1,22 +1,25 @@
 <template>
-    <div>
-        <v-tooltip top>
-            <template v-slot:activator="{ on }">
-                <v-btn v-if="!recorder" dark v-bind="on" @click="record()">
-                    <v-icon class="button is-info">mdi-play</v-icon>
-                </v-btn>
-                <v-btn v-else @click="stop()" dark v-bind="on">
-                    <v-icon>mdi-pause</v-icon>
-                </v-btn>
-                <v-btn dark v-bind="on">
-                    <v-icon>mdi-restart</v-icon>
-                </v-btn>
+    <v-sheet class="bg-blue-lighten-3 text-center" >
+        <div 
+        v-if="!recorder"
+        class="py-3">
+            <v-icon 
+            style="border-radius: 50%;"
+            class="bg-grey"
+            size="40"
+            @click="record()">mdi-microphone</v-icon>
+        </div>
 
-            </template>
-        </v-tooltip>
-    </div>
-
-    <snackBar :errorMessage="this.errorMessage" v-if="this.errorMessage"/>
+        <div v-else class="py-3">
+            <v-icon
+            @click="stop()"
+            style="border-radius: 50%;"
+            class="bg-grey"
+            size="40">mdi-microphone</v-icon>
+            <div>Recording...</div>
+        </div>
+        <snackBar v-if="this.errorMessage" :errorMessage="this.errorMessage" />
+    </v-sheet>
 </template>
 
 <script>
@@ -89,8 +92,43 @@ export default {
             this.recorder.stop();
             this.recorder = null;
         },
+        async clear() {
+            this.recorder.stop();
+            this.recorder = null;
+        }
     },
 }
+
 </script>
 
-<style></style>
+<style>
+.voice-recorder {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.ripple-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  background-color: lightblue;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+</style>
