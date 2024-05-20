@@ -64,7 +64,9 @@ import { useAVLine } from 'vue-audio-visual'
 
 const props = defineProps({
   newAudio: String,
-  totalWidth: Number
+  totalWidth: Number,
+  deleteAudio: Boolean,
+
 })
 
 const player = ref<HTMLAudioElement | null>(null)
@@ -102,6 +104,7 @@ const getSoundPlayState = computed(() => {
 })
 
 const setAudioSound = function () {
+  let prevVolume = ref(0);
   if (player.value) {
     if (!muted.value) {
       prevVolume.value = volume.value;
@@ -136,6 +139,16 @@ watch(() => props.newAudio, (newVal) => {
   }
 })
 
+watch(() => props.deleteAudio, (shouldDelete) => {
+  if (shouldDelete) {
+    if (props.newAudio)
+    {
+      URL.revokeObjectURL(props.newAudio);
+    }
+    player.value = null;
+  }
+})
+
 // Toggle play/pause function
 const togglePlay = () => {
   if (player.value) {
@@ -153,7 +166,7 @@ const togglePlay = () => {
 const updateDuration = () => {
   if (player.value) {
     audioDuration.value = player.value.currentTime;
-
+    
   }
 };
 
@@ -191,7 +204,7 @@ watch(() => audioDuration.value, (change) => {
     player.value.currentTime = change;
     if (wasPlaying) {
       player.value.play();
-  }
+    }
   }
 })
 

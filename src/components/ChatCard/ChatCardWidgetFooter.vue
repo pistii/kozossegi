@@ -20,14 +20,18 @@
         <div v-else>
             <v-row no-gutters align="center">
                 <v-col>
-                    <audioVisualizer :totalWidth="250" class="audio-visualizer-container" :newAudio="this.newAudio" />
+                    <audioVisualizer 
+                    :totalWidth="250" 
+                    class="audio-visualizer-container" 
+                    :newAudio="this.newAudio" 
+                    :deleteAudio="this.delete"/>
                 </v-col>
                 <v-col class="audio-visualizer-container justify-space-between">
                     <v-tooltip text="Vissza" location="top" 
                     open-delay="1000">
                         <template v-slot:activator="{ props }">
-                            <v-btn class="w-100" size="x-small" v-bind="props">
-                                <v-icon size="20" tag="back" start="false" end="false">mdi-keyboard-backspace</v-icon>
+                            <v-btn class="w-100" size="x-small" v-bind="props" @click="deleteAudio()">
+                                <v-icon size="20" tag="back">mdi-keyboard-backspace</v-icon>
                             </v-btn>
                         </template>
                     </v-tooltip>
@@ -83,6 +87,7 @@ import TextBox from './ChatTextBox.vue'
                 newAudio: null,
                 activeMenu: 'text',
                 recording: true,
+                delete: false,
             }
         },
         mounted() {
@@ -98,6 +103,12 @@ import TextBox from './ChatTextBox.vue'
                 this.newAudio = audio
                 this.activeMenu = 'audio'
                 this.recording = false;
+            },
+
+            deleteAudio() {
+                this.delete = true;
+                this.newAudio = null;
+                this.recording = true;
             },
 
             toggleMenu(className) {
