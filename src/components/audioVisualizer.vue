@@ -25,9 +25,8 @@
             hide-details 
             v-model="audioDuration" 
             :max="totalDuration"
-            :step="0.01"
-            @change="seekAudio"
-            @click:prepend="setAudioSound()"></v-slider>
+            :step="0.01">
+            </v-slider>
             </div>
             <div class="pr-4">{{ formattedTotalDuration }}</div>
 
@@ -75,7 +74,6 @@ const volume = ref(100)  // Start sound value
 //For slider display
 let showSlider = ref(false);
 //For mute
-let prevVolume = ref(0);
 let muted = ref(false);
 
 let audioDuration = ref(0);
@@ -185,11 +183,17 @@ const resetDuration = () => {
   }
 };
 
-const seekAudio = (value: number) => {
-  if (player.value) {
-    player.value.currentTime = value;
+watch(() => audioDuration.value, (change) => {
+  if (player.value && change !== Infinity) {
+    console.log("change: " + change);
+    const wasPlaying = !player.value.paused;
+    player.value.pause();
+    player.value.currentTime = change;
+    if (wasPlaying) {
+      player.value.play();
   }
-};
+  }
+})
 
 // Update play state when audio events occur
 const updatePlayState = () => {
@@ -210,7 +214,6 @@ const audioPaused = () => {
 function formatTime(seconds) {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  console.log("minutes: " + minutes + "\n, secs: " + remainingSeconds);
   return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 }
 
