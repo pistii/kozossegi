@@ -13,7 +13,8 @@ const store = createStore({
       //Chat
       GetAllChatRoom: 'api/chat/chatRooms/',
       GetChatContent: 'api/chat/',
-      PostChatMessage: 'api/chat/newChat/',      
+      PostChatMessage: 'api/chat/newChat/',
+      PostFile: 'api/chat/file/',
       //Posts
       CreateNewPost: 'api/post/createNew/',
       GetAllPost: "api/post/GetAllPost/",
