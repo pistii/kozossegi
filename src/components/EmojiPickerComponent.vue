@@ -32,7 +32,10 @@ export default {
     methods: {
         onEmojiPicker() {
             if (this.activeMenu == 'text')
-                this.EmojiVisible = !this.EmojiVisible
+                this.EmojiVisible = !this.EmojiVisible;
+            if (this.activeMenu == 'audio' && this.EmojiVisible) {
+                this.EmojiVisible = false;
+            }
         },
         handleEmojiClick(emoji) {
             eventBus.emit('selectedEmoji', emoji); //Notify the Card Footer component about the added emoji

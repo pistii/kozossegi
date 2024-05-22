@@ -35,6 +35,19 @@ const onSendMessage = async () => {
     }
 };
 const updateChatRoom = (data) => {
+    message.value = '';
     eventBus.emit('updateChatRoom', data)
 }
+
+const addEmoji = (emoji) => {
+    message.value += emoji;
+}
+
+onMounted(() => {
+    eventBus.on('selectedEmoji', addEmoji) //Subscribe to the emoji picker component
+})
+
+onUnmounted(() => {
+    eventBus.off('selectedEmoji', addEmoji);
+})
 </script>

@@ -92,12 +92,8 @@ import TextBox from './ChatTextBox.vue'
         },
         mounted() {
             eventBus.on('newAudioCreated', this.insertAudio)
-            eventBus.on('selectedEmoji', this.addEmoji) //Subscribe to the emoji picker component
         },
         methods: {
-            addEmoji(emoji) {
-                this.messageTo += emoji;
-            },
 
             insertAudio(audio) {
                 this.newAudio = audio
@@ -127,7 +123,6 @@ import TextBox from './ChatTextBox.vue'
         
         beforeDestroy() {
             eventBus.off('newAudioCreated', this.insertAudio());
-            eventBus.off('selectedEmoji', this.addEmoji());
         },
     }
 </script>
