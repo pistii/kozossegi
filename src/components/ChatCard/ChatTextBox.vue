@@ -4,36 +4,24 @@
         placeholder="Say something..."
         append-inner-icon="mdi-send-circle" 
         v-model="message" 
-        @click:append-inner="onSendMessage"
-        v-on:keyup.enter="onSendMessage">
+        @click:append-inner="sendMessage"
+        v-on:keyup.enter="sendMessage">
     </v-text-field>
 </template>
 
 <script setup>
-import UserStore from '@/stores/UserStore';
-import fetchData from '@/stores/server_routes';
-import { ref } from 'vue';
+
+import { ref, onMounted, onUnmounted } from 'vue';
 import eventBus from '@/stores/eventBus';
-import MessageStore from '@/stores/MessageStore';
+import { onSendMessage } from '@/utils/MessageHelper.js'
 
 const message = ref('');
 
-const onSendMessage = async () => {
-    if (message.value.length > 0) {
-        var userId = UserStore.state.userId;
-        var partnerId = MessageStore.getters.getPartnerId();
-        let sendValue = {
-            "senderId": userId,
-            "authorId": userId,
-            "receiverId": partnerId,
-            "message": message,
-            "status": 1
-        }
-        await fetchData.methods.fetchData('POST', "PostChatMessage", sendValue)
-        .then(updateChatRoom(sendValue));
-        message.value = '';
-    }
-};
+const sendMessage = async () => {
+    //parameters: message, url, callback
+    await onSendMessage(message.value, null, updateChatRoom);
+}
+
 const updateChatRoom = (data) => {
     message.value = '';
     eventBus.emit('updateChatRoom', data)

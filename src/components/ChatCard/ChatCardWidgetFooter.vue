@@ -46,6 +46,7 @@
                             class="onHover fill-height py-3 px-1" 
                             fill-height 
                             style="height: 100%;"
+                            @click="send"
                             >
                                 <v-icon 
                                 size="34" 
@@ -71,6 +72,8 @@ import eventBus from '@/stores/eventBus';
 import audioVisualizer from '@/components/audioVisualizer.vue';
 import EmojiPickerComponent from '../EmojiPickerComponent.vue';
 import AudioRecorder from '@/views/Message/MessagePage/audioRecorder.vue';
+
+import { onSendMessage } from '@/utils/MessageHelper.js';
 
 import TextBox from './ChatTextBox.vue'
 
@@ -110,6 +113,18 @@ import TextBox from './ChatTextBox.vue'
             toggleMenu(className) {
                 this.activeMenu = className;
             },
+            async send() {
+                //message, url, callback
+                await onSendMessage(null, this.newAudio, this.onFileSend.bind(this));
+            },
+            onFileSend(response) {
+                if (response === 200) {
+                    //TODO: Display successful audio sending in body then delete blob file.
+                } else {
+                    //TODO: notify user about unsuccessful audio send.
+                    console.log(response)
+                }
+            }
         },
 
         computed: {

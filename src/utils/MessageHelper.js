@@ -1,5 +1,8 @@
 import MessageStore from '@/stores/MessageStore';
 import fetchData from '@/stores/server_routes.js';
+import { PostImage } from '@/stores/server_routes.js';
+import { blobToFile } from '@/utils/common';
+
 import UserStore from '@/stores/UserStore';
 
 export async function createNewChatRoom(user) {
@@ -48,5 +51,37 @@ export function doesRoomExist(chatRooms, chatRoomKey) {
     return index !== -1;
     }
     return -1;
-
 }
+
+export async function onSendMessage(message, url = null, callback) {
+    var userId = UserStore.state.userId;
+    var partnerId = MessageStore.getters.getPartnerId();
+
+    if (!url) { //Most times the url will be empty
+        if (message.length > 0) {
+            let sendValue = {
+                "senderId": userId,
+                "authorId": userId,
+                "receiverId": partnerId,
+                "message": message,
+                "status": 1
+            }
+            await fetchData.methods.fetchData('POST', "PostChatMessage", sendValue)
+            .then(callback(sendValue));
+        }
+    }
+    else {
+        var data = blobToFile(url, "name", "audio/mp3");
+        const file = new FormData();
+        file.append("senderId", userId);
+        file.append("authorId", userId);
+        file.append("receiverId", partnerId);
+        file.append("message", "sdfgdfg");
+        file.append("status", 1);
+        
+        file.append('chatFile.Name', data.name); 
+        file.append('chatFile.Type', data.type); 
+        file.append('chatFile.File', data); 
+        await PostImage('POST', 'PostFile', file).then(resp => callback(resp));
+    }
+};
