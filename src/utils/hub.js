@@ -71,11 +71,6 @@ export async function WatchChat(callback) {
             //console.log(isLoggedin())
             if (isLoggedin()) {
                 console.log("starting connection....")
-                setInterval(async () => {
-                    if (isLoggedin())
-                        await GetOnlineUser();
-                    
-                }, 15000);
 
                 // Eseményfigyelő az online barátok listájának fogadására
                 chatConnection.on("ReceiveOnlineFriends", (onlineFriends) => {
@@ -145,3 +140,34 @@ export const disconnect = () => {
     if (notificationConnection) 
         notificationConnection.stop();
 };
+
+
+//Query friends if user is active and logged in
+let idleTime;
+let userIsActive = false;
+let queryFriendsInterval = 15000; //How frequently get the friends
+let resetTimeInterval = 30000; //Reset after this period of time
+
+setInterval( async () => {
+    if (userIsActive && isLoggedin()) {
+        await GetOnlineUser();
+    }    
+}, queryFriendsInterval);
+
+const resetTimer = () => {
+    clearTimeout(idleTime);
+    if (!userIsActive) {    
+        userIsActive = true;
+    }
+    idleTime = setTimeout(timeHandler, resetTimeInterval); //Callback if the user is inactive
+}
+
+const timeHandler = () => {
+    userIsActive = false;
+    //console.log("user set to: " + userIsActive);
+}
+//On these actions reset the timer so the user is active
+document.addEventListener('mousemove', resetTimer);
+document.addEventListener('mousedown', resetTimer); 
+document.addEventListener('keypress', resetTimer);
+document.addEventListener('touchstart', resetTimer);
