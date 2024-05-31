@@ -1,7 +1,7 @@
 import MessageStore from '@/stores/MessageStore';
 import fetchData from '@/stores/server_routes.js';
 import { PostImage } from '@/stores/server_routes.js';
-import { blobToFile } from '@/utils/common';
+import { blobToFile, blobToBase64, base64ToBlob } from '@/utils/common';
 
 import UserStore from '@/stores/UserStore';
 
@@ -53,13 +53,16 @@ export function doesRoomExist(chatRooms, chatRoomKey) {
     return -1;
 }
 
+//Sends a message with the desired text, or it can be an audio
 export async function onSendMessage(message, url = null, callback) {
     var userId = UserStore.state.userId;
-    var partnerId = MessageStore.getters.getPartnerId();
+    var partnerId = MessageStore.getters.getPartner().id;
 
     if (!url) { //Most times the url will be empty
         if (message.length > 0) {
             let sendValue = {
+                "chatContentId": 0,
+                "chatFile": null,
                 "senderId": userId,
                 "authorId": userId,
                 "receiverId": partnerId,
@@ -71,17 +74,32 @@ export async function onSendMessage(message, url = null, callback) {
         }
     }
     else {
-        var data = blobToFile(url, "name", "audio/mp3");
+        
+        let blobObj = await fetch(url).then(r => r.blob());
+        const base64Data = await blobToBase64(blobObj);
+        const mimeType = "audio/wav";
+        const blob = base64ToBlob(base64Data.split(',')[1], mimeType);
+        const fileBlob = blobToFile(blob, "audioFile.wav", mimeType);
+
         const file = new FormData();
         file.append("senderId", userId);
         file.append("authorId", userId);
         file.append("receiverId", partnerId);
-        file.append("message", "sdfgdfg");
+        file.append("message", "w");
         file.append("status", 1);
         
-        file.append('chatFile.Name', data.name); 
-        file.append('chatFile.Type', data.type); 
-        file.append('chatFile.File', data); 
+        file.append('chatFile.Name', fileBlob.name); 
+        file.append('chatFile.Type', fileBlob.type); 
+        file.append('chatFile.File', fileBlob); 
+        
         await PostImage('POST', 'PostFile', file).then(resp => callback(resp));
     }
+};
+
+//Called to send a message to the selected user
+export function sendMessageToUser(user) {
+    if (!MessageStore.getters.getOpenedChatRoom() != null) {
+        MessageStore.commit('addChatRooms', user);
+    }
+    MessageStore.commit('setPartner', user);
 };

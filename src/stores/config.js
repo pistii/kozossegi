@@ -12,6 +12,7 @@ const store = createStore({
       GetNotifications: 'api/notification/',
       //Chat
       GetAllChatRoom: 'api/chat/chatRooms/',
+      GetChatContentByUserId: 'api/chat/roomByUserId/',
       GetChatContent: 'api/chat/',
       PostChatMessage: 'api/chat/newChat/',
       PostFile: 'api/chat/file/',
