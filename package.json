@@ -2,9 +2,10 @@
   "name": "kozossegi",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "set \"VITE_CJS_TRACE=true\" && vite build",
     "preview": "vite preview",
     "test:unit": "jest",
     "test": "jest"
