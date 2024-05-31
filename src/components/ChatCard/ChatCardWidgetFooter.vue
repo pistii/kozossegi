@@ -115,15 +115,18 @@ import TextBox from './ChatTextBox.vue'
             },
             async send() {
                 //message, url, callback
-                await onSendMessage(null, this.newAudio, this.onFileSend.bind(this));
+                await onSendMessage(null, this.newAudio, this.onFileSend);
             },
             onFileSend(response) {
-                if (response === 200) {
-                    //TODO: Display successful audio sending in body then delete blob file.
-                } else {
-                    //TODO: notify user about unsuccessful audio send.
-                    console.log(response)
+                var data = response;
+                var chatFile = {
+                    'FileToken': this.newAudio,
+                    'FileType': 'audio/wav',
+                    'local': true,
                 }
+                var combinedData = Object.assign({}, data, { chatFile: chatFile });
+                eventBus.emit('new-message', combinedData);
+                this.recording = true;
             }
         },
 
@@ -138,6 +141,7 @@ import TextBox from './ChatTextBox.vue'
         
         beforeDestroy() {
             eventBus.off('newAudioCreated', this.insertAudio());
+            URL.revokeObjectURL(this.newAudio);
         },
     }
 </script>
