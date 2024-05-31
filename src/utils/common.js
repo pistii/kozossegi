@@ -3,7 +3,7 @@ import moment from 'moment'
 export function formatDate(date) {
     const today = new Date();
     let passedTime = today.getDate() - moment(date).date();
-    if (passedTime > 1) { //Ha több mint egy nap telt el
+    if (passedTime < 1) { //Ha több mint egy nap telt el
         return moment(date).format("YYYY.MM.DD")
     }
     else {
@@ -73,3 +73,43 @@ export function getImage(token) {
 export const compareArrays = (a, b) => {
     return JSON.stringify(a) === JSON.stringify(b);
 };
+
+
+export function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+export function base64ToBlob(base64, mimeType) {
+    const byteCharacters = atob(base64);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
+}
+export function blobToUrl(blob) {
+    return URL.createObjectURL(blob);
+}
+export function blobToFile(blob, fileName, type) {
+    const file = new File([blob], fileName, { type: type });
+    return file;
+}
+
+export function fileToBlob(file) {
+    // Fájl adatok dekódolása
+    const byteArray = new Uint8Array(file.length);
+
+    const blob = new Blob([byteArray], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    return url.src;
+}
