@@ -12,7 +12,7 @@
                         class="onHover bg-blue-grey-lighten-5"
                         :value="item" 
                         color="primary" 
-                        @click="sendMessageToUser(item)">
+                        @click="notifyChatCard(item)">
                             <template v-slot:prepend >
                                 <v-avatar size="30">
                                     <img :src="getUserAvatar(item.avatar)"  height="40" />
@@ -51,12 +51,13 @@
 
 <script>
 import UserStore from '@/stores/UserStore';
-import MessageStore from '@/stores/MessageStore'
 import {getUserAvatar, getFullName } from '@/utils/common';
-import eventBus from '@/stores/eventBus';
+import { sendMessageToUser } from '@/utils/MessageHelper.js';
 
 import { ref } from 'vue';
-import { isLoggedin } from '../utils/auth';
+import { isLoggedin } from '@/utils/auth';
+import eventBus from '@/stores/eventBus.js';
+import fetchData from '@/stores/server_routes';
 
 var onlineFriends = ref(UserStore.getters.getOnlineUsers());
 const userFriends = ref(UserStore.getters.getUserFriends());
@@ -65,6 +66,8 @@ const MAX_ONLINE_USERS = 100;
 const MIN_USERS_TO_RETURN = 30; 
 const MAX_USERS_TO_RETURN = Math.floor(Math.random() * MAX_ONLINE_USERS); //0 és 100 között ad vissza egy értéket
 const RANDOM_USER_TO_RETURN = MAX_USERS_TO_RETURN + MIN_USERS_TO_RETURN; //30 és 100 között ad vissza értéket
+
+
 export default {
     computed: {
         
@@ -125,9 +128,20 @@ export default {
             MAX_USERS_TO_RETURN,
             searchTxt: '',
             isLoggedin,
+
+            sendMessageToUser
         }
     },
     methods: {
+        async getAllChatRoom() {
+            var chatRooms = await fetchData.methods
+                .fetchData('GET', 'GetAllChatRoom', null, UserStore.state.userId);
+            return chatRooms;
+        },
+        //Notifies the overlaychat to create a temporary instance
+        notifyChatCard(user) {
+            eventBus.emit('newChat', user);
+        },
         getRandomSubarray(arr, size) { //Ez most egyelőre nem kell
             var shuffled = arr.slice(0), i = arr.length, temp, index;
             while (i--) {
@@ -137,15 +151,6 @@ export default {
                 shuffled[i] = temp;
             }
             return shuffled.slice(0, size);
-        },
-        sendMessageToUser(user) {
-            if (!MessageStore.getters.getOpenedChatRooms().includes(user)) {
-                MessageStore.commit('addChatRooms', user);
-            }
-            MessageStore.commit('setPartner', user);
-            MessageStore.commit('setPartnerId', user.id);
-            //console.log(user)
-            eventBus.emit('invoke-message-dialog-panel', false);
         },
         sortByStatusAndName(allUser, onlineUser) {
             let mergedUsers = [...onlineUser, ...allUser];
