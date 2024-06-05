@@ -10,6 +10,7 @@ import * as directives from 'vuetify/directives'
 import UserStore from './stores/UserStore'
 
 import { AVPlugin } from "vue-audio-visual";
+import emitter from './stores/eventBus'
 
 const app = createApp(App);
 
@@ -17,6 +18,8 @@ const vuetify = createVuetify({
   components,
   directives,
 });
+
+app.config.globalProperties.$emitter = emitter;
 
 app
 .use(UserStore)

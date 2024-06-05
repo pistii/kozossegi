@@ -23,7 +23,7 @@ export default {
     },
     data() {
         return {
-            containerHeight : 400,
+            containerHeight : 420,
         }
     },    
     components: {

@@ -14,8 +14,6 @@
 
 
 <script>
-import { onSendMessage } from '@/utils/MessageHelper.js';
-import eventBus from '@/stores/eventBus.js';
 import { fileToBlob } from '@/utils/common.js';
 
 /*
@@ -65,12 +63,10 @@ export default {
                 };
                 console.log("url read: " + fileBlob);
                 //Notify the ChatTextBox about the new added file
-                eventBus.emit('chat-image-send', fileData);
+                this.$emitter.emit('chat-image-send', fileData);
+
             }
-        },
-        async uploadFile() {
-            await onSendMessage('', selectedFile, selectedFile.type, this.uploadResult);
-        },
+        }
     },
 };
 </script>

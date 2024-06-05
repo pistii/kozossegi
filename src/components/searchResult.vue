@@ -14,7 +14,6 @@
 
 <script>
 import { reactive, ref } from 'vue';
-import eventBus from '@/stores/eventBus.js';
 import UserCard from '@/components/UserCard.vue';
 
 var searchResult = ref([]);
@@ -24,7 +23,7 @@ export default {
         UserCard,
     },
     mounted() {
-        eventBus.on('searchResult', (val) => {
+        this.$emitter.on('searchResult', (val) => {
             searchResult.value = val
         });
     },
@@ -36,7 +35,7 @@ export default {
     },
     
     beforeDestroy() {
-        eventBus.$off('searchResult')
+        this.$emitter.off('searchResult')
     }
 }
 

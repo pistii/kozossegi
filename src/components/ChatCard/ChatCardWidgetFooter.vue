@@ -21,7 +21,6 @@
     <div v-if="activeMenu=='audio'">
         <AudioRecorder v-if="this.recording" @newAudioCreated="passUrlToChild"/>
         <AudioSender v-else 
-        :recording="this.recording" 
         :url="this.url"
         @recording="toggleRecording"
         @activeMenu="toggleMenu"
@@ -79,7 +78,7 @@ export default {
 
 <style scoped>
 .chat-menu-icon-row {
-    background: linear-gradient(#72d0e8, #2f8f96);
+    background: linear-gradient(#72d0e8, #50a8ae, #72d0e8);
 }
 .active {
     margin-left: 3px;
