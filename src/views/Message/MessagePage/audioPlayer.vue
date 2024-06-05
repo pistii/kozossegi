@@ -4,7 +4,7 @@
 			<template v-slot:activator="{ on }">
 				<audio  style="width: 270px; height: 50px" controls>
 					<source v-if="!audio.local" :src="blobToUrl(base64ToBlob(audio.fileData, 'audio/wav'))">
-					<source v-else :src="audio.FileToken" >
+					<source v-else :src="audio.fileToken" >
 				</audio>
 			</template>
 			<v-card>
@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { base64ToBlob, blobToUrl, fileToBlob } from '@/utils/common.js';
+import { base64ToBlob, blobToUrl } from '@/utils/common.js';
 const props = defineProps( ['audio'])
 
 </script>
