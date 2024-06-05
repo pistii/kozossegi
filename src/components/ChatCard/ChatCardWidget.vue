@@ -1,15 +1,13 @@
 <template>
-    <div :style="{ height: containerHeight + 'px' }" 
+    <div :style="{ maxHeight: containerHeight + 'px' }" 
     class="bg-blue-lighten-4 elevation-11">    
-    
-        <ChatCardWidgetHeader @setChatContainerHeight="setChatContainerHeight"/>
         
+        <ChatCardWidgetHeader @setChatContainerHeight="setChatContainerHeight" :userInfo="this.open" />
         
         <v-row >
             <ChatCardWidgetBody style="max-width: 324px;" />
             
         </v-row>  
-        
         <ChatCardWidgetFooter />
     </div>
 </template>
@@ -20,14 +18,14 @@ import ChatCardWidgetBody from './ChatCardWidgetBody.vue';
 import ChatCardWidgetFooter from './ChatCardWidgetFooter.vue';
 
 export default {
+    props: {
+        open: Object
+    },
     data() {
         return {
-            containerHeight : undefined,
-            showMicMenu: false,
-
+            containerHeight : 400,
         }
-    },
-
+    },    
     components: {
         ChatCardWidgetHeader,
         ChatCardWidgetBody,
@@ -38,6 +36,7 @@ export default {
             this.containerHeight = size;
         },
     },
+    
 }
 </script>
 
