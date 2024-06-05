@@ -4,7 +4,7 @@
             <audioVisualizer 
                 class="audio-visualizer-container" 
                 :totalWidth="250"
-                :newAudio="this.newAudio"
+                :newAudio="this.url"
                 :deleteAudio="this.delete" />
         </v-col>
         <v-col class="audio-visualizer-container justify-space-between">
@@ -36,40 +36,31 @@ import MessageStore from '@/stores/MessageStore';
 
 export default {
     props: {
-        recording: Boolean
+        url: String
     },
     components: {
         audioVisualizer
     },
     data() {
         return {
-            newAudio: null,
             delete: false,
         }
     },
     methods: {
-
-        insertAudio(audio) {
-            this.newAudio = audio
-            this.$emit('activeMenu', 'audio');
-            console.log("new audio created");
-            this.notifyParentAboutRecording(false);
-        },
-
         deleteAudio() {
             this.delete = true;
-            this.newAudio = null;
+            this.url = null;
             this.notifyParentAboutRecording(true);
         },
         async send() {
             //message, url, mimeType, callback
-            await onSendMessage(null, this.newAudio, "audio/wav", this.onFileSend);
+            await onSendMessage(null, this.url, "audio/wav", this.onFileSend);
         },
         onFileSend(response) {
             var data = response;
             var chatFile = {
-                'FileToken': this.newAudio,
-                'FileType': 'audio/wav',
+                'fileToken': this.url,
+                'fileType': 'audio/wav',
                 'local': true,
             }
             var combinedData = Object.assign({}, data, { chatFile: chatFile });
@@ -85,7 +76,7 @@ export default {
     },
     
     beforeDestroy() {
-        URL.revokeObjectURL(this.newAudio);
+        URL.revokeObjectURL(this.url);
     }
 }
 </script>
