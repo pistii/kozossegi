@@ -30,7 +30,7 @@
             </div>
             <div class="pr-4">{{ formattedTotalDuration }}</div>
 
-
+            
             <v-menu location="top" origin="auto"  open-on-hover open-on-click width="100" >
                 <template v-slot:activator="{ props }">
                 <v-icon
@@ -43,14 +43,13 @@
                 </template>
 
                 <v-slider 
-                class="bg-blue-darken-1 pa-3 py-0 v-slider-border"
-                
-                thumb-color="blue-darken-4"
-                    thumb-size="15" 
-                    hide-details 
-                    v-model="volume" 
-                    @click:prepend="setAudioSound()">
-                    </v-slider>
+                  class="bg-blue-darken-1 pa-3 py-0 v-slider-border"
+                  thumb-color="blue-darken-4"
+                  thumb-size="15" 
+                  hide-details 
+                  v-model="volume" 
+                  @click:prepend="setAudioSound()">
+                  </v-slider>
             </v-menu>
 
         </div>
@@ -60,7 +59,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, onUnmounted } from 'vue'
-import { useAVLine } from 'vue-audio-visual'
+import { useAVLine } from 'vue-audio-visual';
 
 const props = defineProps({
   newAudio: String,
@@ -73,8 +72,6 @@ const player = ref<HTMLAudioElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
 const volume = ref(100)  // Start sound value
 
-//For slider display
-let showSlider = ref(false);
 //For mute
 let muted = ref(false);
 
@@ -198,7 +195,6 @@ const resetDuration = () => {
 
 watch(() => audioDuration.value, (change) => {
   if (player.value && change !== Infinity) {
-    console.log("change: " + change);
     const wasPlaying = !player.value.paused;
     player.value.pause();
     player.value.currentTime = change;
@@ -252,6 +248,7 @@ onUnmounted(() => {
   }
 });
 
+ 
 </script>
 
 <style scoped>
