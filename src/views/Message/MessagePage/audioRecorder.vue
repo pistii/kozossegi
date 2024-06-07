@@ -24,10 +24,8 @@
 
 <script>
 import snackBar from '@/components/snackBar.vue';
-import eventBus from '@/stores/eventBus';
 
 const recordedChunks = [];
-
 
 export default {
     components: {
@@ -49,9 +47,7 @@ export default {
         async record() {
             if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
                 this.errorMessage = "Feature is not supported by browser";
-                return Promise.reject(new Error("Feature is not supported by browser")
-            
-            );
+                return Promise.reject(new Error("Feature is not supported by browser"));
             }
             this.newAudio = null;
             navigator.mediaDevices.getUserMedia({ audio: true })
@@ -82,12 +78,11 @@ export default {
         },
 
         async stop() {
-            
             this.recorder.addEventListener("stop", () => {
-                const blobObj = new Blob(recordedChunks, {'type': 'audio/mp3'} );
+                const blobObj = new Blob(recordedChunks, {'type': 'audio/wav'} );
                 const audioUrl = URL.createObjectURL(blobObj);
 
-                eventBus.emit('newAudioCreated', audioUrl);
+                this.$emit('newAudioCreated', audioUrl);
             });
             this.recorder.stop();
             this.recorder = null;
