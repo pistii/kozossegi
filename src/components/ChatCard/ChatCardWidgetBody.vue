@@ -1,42 +1,46 @@
 <template>
     <v-col>
-        <div v-if="loadMoreMessage_Progress"
+        <div v-if="isDataLoading"
             class="overlayLoading">
             <v-progress-circular
                 :width="3"
                 color="blue"
                 indeterminate
-                v-show="loadMoreMessage_Progress" 
+                v-show="isDataLoading" 
             >
             </v-progress-circular>
         </div>
-
         <v-sheet 
         class="messaging_area  scrollbar scroll_msg_pane containerSize" id="container"
-        v-if="this.chatContents" ref="parent">
-                <Observer v-if="showObserver" @intersect="handleIntersection" 
-                :options="{ threshold: 0.3 }" />
-            <span v-for="(message, index) in this.chatContents.data" :key="index">
-                <chat-msg-comp  :msg="message" />
-            </span>
-        </v-sheet> 
-        <v-container class="containerSize" v-else>
-            <p v-if="!loadMoreMessage_Progress">Még nincs megjelenítendő beszélgetés...</p>
-        </v-container>
-           
+         ref="parent">
+            <div>
+            <Observer @intersect="handleIntersection" 
+            :options="{ threshold: 0.3 }" />
+
+            <v-container class="containerSize" v-if="noDataFound">
+                <p>Még nincs megjelenítendő beszélgetés...</p>
+            </v-container>
+            <div v-else>
+                <span
+                    v-for="(message, index) in fetchMessages?.chat?.data" 
+                    :key="index">
+                    <chat-msg-comp :msg="message" />
+                </span>
+            </div>
+        </div>
+        </v-sheet>            
     </v-col>
 </template>
 
 <script>
 import MessageStore from '@/stores/MessageStore';
-import { ref, nextTick, onMounted } from 'vue';
+import { ref, nextTick } from 'vue';
 import eventBus from '@/stores/eventBus';
 
 import ChatMessageComponent from '@/views/Message/MessagePage/ChatMessageComponent.vue'
 import Observer from '@/components/Observer.vue'
 
 
-const loadMoreMessage_Progress = ref(false);
 const chatContents = ref([]);
 const enableObserver = ref(false);
 
@@ -47,18 +51,13 @@ export default {
     },
     mounted() {
         eventBus.on('update-scrollHeight', this.stayBottom);
-        this.fetchMessages();
    },
    
    setup() {
         const parent = ref(null);
-        var currentPage = ref(1);
-        var totalPages = ref(null);
 
         const loadMoreMessage = async () => {
-            var response = await MessageStore.dispatch('loadMoreMessage');
-            totalPages.value = response.totalPages;
-            currentPage.value = response.currentPage;
+            await MessageStore.dispatch('loadMoreMessage', chatContents.value.chat);
         }
         const base64ToImage = (data) => {
             var imageTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];
@@ -79,31 +78,24 @@ export default {
                             console.log(chatContents.chatFile.fileData);
                         }
                     }
-                    // switch (chatContents.chatFile.fileType) {
-                    //     case 'image/wav':
-                    //         console.log("file is audio!")
-                    //         break;
-                    //     case imageTypes.includes(chatContents.chatFile.fileType):
-                    //         console.log("file is image!");                        
-                    //         break;
-                    //     default:
-                    //         break;
-                    //     }
-                    // }
                 }
             }
         };
         const handleIntersection = () => {
-            if (totalPages.value > currentPage.value) {
-                if (chatContents.value.length !== 0) {
-                    setTimeout(() => {
-                        loadMoreMessage_Progress.value = true;
-                        loadMoreMessage().then(() => {
-                            scrollBack();
-                            loadMoreMessage_Progress.value = false;
-
-                        });
-                    }, 100);
+            if (chatContents.value !== undefined) {
+                var totalPages = chatContents?.value.chat?.totalPages;
+                var cp = chatContents?.value.chat?.currentPage;
+                if (totalPages >= cp) {
+                    if (chatContents.value.chat.data.length !== 0) {
+                        setTimeout(() => {
+                            MessageStore.commit('showLoader', true);
+                            loadMoreMessage().then(() => {
+                                MessageStore.commit('showLoader', false);  
+                                scrollBack();
+                        
+                            });
+                        }, 100);
+                    }
                 }
             }
         };
@@ -111,7 +103,7 @@ export default {
         const scrollBack = () => {
             if (parent.value.$el) {
                 //scrollTop
-                parent.value.$el.scrollTop = parent.value.$el.scrollTop + 1350; 
+                parent.value.$el.scrollTop = parent.value.$el.scrollTop + 400; 
             }
         };
 
@@ -122,15 +114,13 @@ export default {
         }
    },
    watch: {
-        userPartnerId() {
-            this.fetchMessages();
-        },
         getChatContents: {
             deep: true,
             handler () {
-                this.updateContent();
+                //this.updateContent();
+                this.stayBottom();
             }
-        }
+        },
    },
    computed: {
         getChatContents() {
@@ -138,35 +128,27 @@ export default {
         },
         showObserver() {
             return enableObserver;
+        },
+        isDataLoading() {
+            return MessageStore.getters.getLoadingState();
+        },
+        fetchMessages() {
+            chatContents.value = MessageStore.getters.getActiveChat();
+            return MessageStore.getters.getActiveChat();
+        },
+        noDataFound() {
+            return !MessageStore.getters.getActiveChat()?.chat?.data && !MessageStore.getters.getLoadingState();
         }
     },
     data() {
         return {
-           loadMoreMessage_Progress,
+           loadMoreMessage_Progress : false,
 
             chatContents,
             enableObserver,
         }
     },
-    
     methods: {
-
-        async fetchMessages() {
-            this.loadMoreMessage_Progress = true;
-            if (MessageStore.getters.getPartner() !== null) {
-                var response = await MessageStore.dispatch('fetchMessages');
-                this.chatContents = response;
-
-                this.loadMoreMessage_Progress = false;
-                if (chatContents.value) {
-                    chatContents.value.data.reverse();
-                }
-                this.stayBottom();
-                this.totalPages = chatContents.value.totalPages;
-                
-                enableObserver.value = true;
-            }
-        },
         scrollToBottom() {
             const container = this.$refs.parent;
             if (container != null) {
@@ -197,21 +179,10 @@ export default {
 </script>
 
 <style scoped>
-.emoticon {
-    cursor: pointer;
-    right: 0;
-    height: 17px;
-}
-
-.absolute {
-    position: absolute;
-}
-
 .messaging_area {
     background-color: rgba(0, 128, 0, 0.133);
 }
 
-/*Here can be modified the chat rooms and contents height */
 .scroll_msg_pane {
     overflow-y: auto;
     overflow-x: hidden;
@@ -221,13 +192,6 @@ export default {
     height: 300px;
     max-height: 350px;
     max-height: 30vh;
-}
-
-.chatCardFooter {
-    background-color: #64B5F6;
-    width:100%;
-    margin-left: 0px; 
-    margin-top: 1px; 
 }
 
 .overlayLoading {
