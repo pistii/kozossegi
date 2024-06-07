@@ -51,5 +51,17 @@ export default {
     font-size: 13px;
 }
 
-
+.chatHeadContainer {
+    position: fixed;
+    background-color: green;
+    bottom: 0;
+    height: 300px;
+    min-width: 40px;
+    right: 300px;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+    
+}
 </style>
