@@ -2,13 +2,12 @@
     <div :style="{ maxHeight: containerHeight + 'px' }" 
     class="bg-blue-lighten-4 elevation-11">    
         
-        <ChatCardWidgetHeader @setChatContainerHeight="setChatContainerHeight" :userInfo="this.open" />
+        <ChatCardWidgetHeader @setChatContainerHeight="setChatContainerHeight" />
         
         <v-row >
             <ChatCardWidgetBody style="max-width: 324px;" />
-            
         </v-row>  
-        <ChatCardWidgetFooter />
+        <ChatCardWidgetFooter/>
     </div>
 </template>
 
@@ -18,9 +17,6 @@ import ChatCardWidgetBody from './ChatCardWidgetBody.vue';
 import ChatCardWidgetFooter from './ChatCardWidgetFooter.vue';
 
 export default {
-    props: {
-        open: Object
-    },
     data() {
         return {
             containerHeight : 420,
@@ -40,21 +36,11 @@ export default {
 }
 </script>
 
-<style>
-
-
+<style scoped>
 .overlayContainer {
     bottom: 0;
     z-index: 10000;
 }
-
-.panelNavHeader {
-    border-radius: 30px;
-    max-height: 25px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
 
 .slide-fade-enter-active {
   transition: all 0.3s ease-out;
