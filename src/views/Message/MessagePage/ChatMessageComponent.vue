@@ -1,9 +1,9 @@
 <template>
     <div :class="{ 'mx-2 d-flex justify-end' : msg.authorId === userId}"
         class="ma-2 d-flex" > 
-        <span v-if="msg.chatFile !== null">
-            <!-- {{ msg.chatFile }} -->
-            <audioPlayer :audio="msg.chatFile"/>
+        <span v-if="msg.chatFile !== null && msg.chatFile !== undefined">
+            <audioPlayer v-if="msg.chatFile?.fileType === 'audio/wav'" :audio="msg.chatFile"/>
+            <imageViewer v-else :msg="msg" :userId="this.userId"/>        
         </span>
         
         <div v-else>
@@ -49,24 +49,40 @@
 import UserStore from '@/stores/UserStore'
 import { formatDate } from '@/utils/common';
 import audioPlayer from './audioPlayer.vue';
+import imageViewer from '@/components/ChatCard/ImageViewer.vue';
+import {base64ToBlob, blobToUrl} from '@/utils/common.js';
 
 export default {
     components: {
-        audioPlayer
+        audioPlayer,
+        imageViewer
     },
     props: {
         msg: Object,        
     },
+    
     data() {
         return {
             userId: UserStore.state.userId,
             expandDate: false,
             formatDate,
+
+            base64ToBlob,
+            blobToUrl,
         }
     },
     updated() {
         this.expandDate = false
-    }
+    },
+    methods: {
+        isFileImage(type) {
+            var imageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            if (imageTypes.includes(type)) {
+                return true;
+            }
+            return false;
+        }
+    }    
 }
 </script>
 
