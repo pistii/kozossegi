@@ -1,19 +1,16 @@
 <template>
     <div class="bg-blue-darken-2 panelNavHeader">
         <v-row class="justify-end justify-space-evenly">
-            <span class="onHover"
-            v-for="person in getOpenedChatRooms"
-            @click="switchMessageTab(person.id)" >
+            <span >
                 <div class="truncateText">
                     <v-avatar size="30" >
-                        <img :src="getUserAvatar(person.avatar)" height="30" />
+                        <img :src="getUserAvatar(userInfo?.user?.avatar)" height="30" />
                     </v-avatar> 
                     <div class="nameTab">
-                        {{ getFullName(person.firstName, person.middleName, person.lastName) }}
+                        {{ getFullName(userInfo?.user?.firstName, userInfo?.user?.middleName, userInfo?.user?.lastName) }}
                     </div>
                 </div>
             </span>
-
             <!--main tab-->
             <v-btn 
             @click="minimalizeWindow()" 
@@ -26,7 +23,7 @@
                     mdi-square-outline
                 </v-icon>
             </v-btn>
-            <v-btn class="mr-3" @click="WindowHandler()" variant="plain" size="x-small">
+            <v-btn class="mr-3" @click="closeWindow()" variant="plain" size="x-small">
                 <v-icon>
                     mdi-close-circle
                 </v-icon>
@@ -40,31 +37,34 @@ import { getFullName, getUserAvatar } from '@/utils/common';
 import MessageStore from '@/stores/MessageStore';
 
 export default {
+    computed: {
+        dataIsLoading() {
+            return MessageStore.getters.getLoadingState();
+        },
+        userInfo() {
+            return MessageStore.getters.getActiveChat();
+        }
+    },
     data() {
         return {
             getFullName, getUserAvatar,
             DEFAULT_CONTAINER_HEIGHT: 10,
             containerHeight: this.DEFAULT_CONTAINER_HEIGHT, // Kezdeti érték
-            
             minimalized: false,
-            
-            tabVisible: true,
-            getFullName,
+            temporaryData: {
+                user: {
+                    avatar: '',
+                    firstName: '',
+                    middleName: '',
+                    lastName: ''
+                }
+            },
         }
     },
-    computed: {
-        getOpenedChatRooms() {
-            return MessageStore.getters.getOpenedChatRooms();
-        }
-    },
-    methods: {
-        switchMessageTab(id) {
-            showMessage(key[1].key.chatRoomId, key[1].value)
-        },
-        
+    methods: {        
         minimalizeWindow() {
             if (this.minimalized) {
-                this.containerHeight = 460;
+                this.containerHeight = 420;
                 this.minimalized = false;
                 this.$emit('setChatContainerHeight', this.containerHeight);
             }
@@ -74,14 +74,23 @@ export default {
                 this.$emit('setChatContainerHeight', this.containerHeight);
             }
         },
-        WindowHandler() {
-            MessageStore.dispatch('removeOpenedChatRoom', MessageStore.getters.getPartnerId());
-            
-        }
-    }
+        closeWindow() {
+            console.log(this.userInfo.user.id)
+            MessageStore.dispatch('removeOpenedChatRoom', this.userInfo.user.id);
+        },
+    },
 }
 </script>
 <style scoped>
+
+
+.panelNavHeader {
+    border-radius: 30px;
+    max-height: 25px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 .nameTab {
     transform: skewX(5deg);
     font-family: Verdana;
@@ -95,13 +104,4 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-
-.panelNavHeader {
-    border-radius: 30px;
-    max-height: 25px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
 </style>
