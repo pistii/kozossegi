@@ -51,13 +51,12 @@
 
 <script>
 import UserStore from '@/stores/UserStore';
+import MessageStore from '@/stores/MessageStore';
+
 import {getUserAvatar, getFullName } from '@/utils/common';
-import { sendMessageToUser } from '@/utils/MessageHelper.js';
 
 import { ref } from 'vue';
 import { isLoggedin } from '@/utils/auth';
-import eventBus from '@/stores/eventBus.js';
-import fetchData from '@/stores/server_routes';
 
 var onlineFriends = ref(UserStore.getters.getOnlineUsers());
 const userFriends = ref(UserStore.getters.getUserFriends());
@@ -129,18 +128,13 @@ export default {
             searchTxt: '',
             isLoggedin,
 
-            sendMessageToUser
         }
     },
+    
     methods: {
-        async getAllChatRoom() {
-            var chatRooms = await fetchData.methods
-                .fetchData('GET', 'GetAllChatRoom', null, UserStore.state.userId);
-            return chatRooms;
-        },
         //Notifies the overlaychat to create a temporary instance
         notifyChatCard(user) {
-            eventBus.emit('newChat', user);
+            MessageStore.dispatch("addUser", user);
         },
         getRandomSubarray(arr, size) { //Ez most egyelőre nem kell
             var shuffled = arr.slice(0), i = arr.length, temp, index;
