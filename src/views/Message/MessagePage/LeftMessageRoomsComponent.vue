@@ -30,12 +30,11 @@
                                 </v-col>
                                 <v-col>
                                     <v-row class=" pa-3">
-                                        <span v-if="room[1].key.chatContents.      length>0" 
-                                            v-html="formatText(room[1].key.chatContents[0].message)">
+                                        <span v-if="room.key.chatContents.length>0"  class="text-container">
+                                            <span >
+                                                {{ formatText(room.key.chatContents[room.key.chatContents.length -1]) }}
+                                            </span>
                                         </span>
-                                        <!-- <span  v-if="room[1].key.chatContents.      length>0" ref="textContainer" class="text-container">
-                                            {{ room[1].key.chatContents[0].message }}
-                                        </span> -->
                                         <span v-else></span> 
                                     </v-row>
                                 </v-col>
@@ -132,9 +131,12 @@ export default {
     }
 }
 
-function formatText(text) {
+function formatText(message) {
     const n = 30;
-    return (text.length > n) ? text.slice(0, n-1) + '&#8230;' : text;
+    if (message)
+        if (message.chatFile) return "Üzenet csatolmánnyal.";
+        else return (text.length > n) ? text.slice(0, n-1) + '&#8230;' : text;
+    else return 'Üzenet csatolmánnyal.'
 }
 
 function shouldUpdateTime(newDateTime, currentDateTime) {
