@@ -3,7 +3,10 @@
         class="ma-2 d-flex" > 
         <span v-if="msg.chatFile !== null && msg.chatFile !== undefined">
             <audioPlayer v-if="msg.chatFile?.fileType === 'audio/wav'" :audio="msg.chatFile"/>
-            <imageViewer v-else :msg="msg" :userId="this.userId"/>        
+            <videoPlayer v-else-if="msg.chatFile?.fileType === 'video/mp4'" :video="msg.chatFile" />
+            <imageViewer v-else-if="isFileImage(msg.chatFile?.fileType)"
+            :msg="msg" :userId="this.userId"/>
+
         </span>
         
         <div v-else>
@@ -49,12 +52,13 @@
 import UserStore from '@/stores/UserStore'
 import { formatDate } from '@/utils/common';
 import audioPlayer from './audioPlayer.vue';
+import videoPlayer from './videoPlayer.vue';
 import imageViewer from '@/components/ChatCard/ImageViewer.vue';
-import {base64ToBlob, blobToUrl} from '@/utils/common.js';
 
 export default {
     components: {
         audioPlayer,
+        videoPlayer,
         imageViewer
     },
     props: {
@@ -66,9 +70,6 @@ export default {
             userId: UserStore.state.userId,
             expandDate: false,
             formatDate,
-
-            base64ToBlob,
-            blobToUrl,
         }
     },
     updated() {
@@ -77,10 +78,7 @@ export default {
     methods: {
         isFileImage(type) {
             var imageTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-            if (imageTypes.includes(type)) {
-                return true;
-            }
-            return false;
+            return imageTypes.includes(type);
         }
     }    
 }
