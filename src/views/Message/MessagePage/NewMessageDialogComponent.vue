@@ -1,5 +1,5 @@
 <template>
-    <v-btn rounded="xl" color="deep-purple-accent-2" @click="newMessageDialog = true">
+    <v-btn rounded="xl" color="deep-purple-accent-2" @click="loadData()">
         <v-icon start icon="mdi-plus">
         </v-icon>
         Új üzenet
@@ -51,16 +51,6 @@ import UserStore from '@/stores/UserStore';
 var friends = ref([]);
 
 export default {
-    setup() {
-        console.log(friends.value)
-
-        if (friends.value.length === 0) {
-            //fetchData.methods.fetchData('GetMessageFriends', 100) //TODO: egyelőre 100 barátot kérdez le, és nem kell az egész barát lista tartalmát visszadni.
-            fetchData.methods.fetchData('GET', 'GetMessageFriends', null, UserStore.getters.getUserId(), 1, 100)
-            .then(resp => friends.value.push(resp))
-                console.log(friends.value)
-        }
-    },
     emits: ['sendToUser'],
     computed: {
         filteredFriends() {
@@ -85,6 +75,17 @@ export default {
         }
     },
     methods: {
+        loadData() {
+            //console.log(friends.value)
+            this.newMessageDialog = true;
+            if (friends.value.length === 0) {
+                //fetchData.methods.fetchData('GetMessageFriends', 100) //TODO: egyelőre 100 barátot kérdez le, és nem kell az egész barát lista tartalmát visszadni.
+                fetchData.methods.fetchData('GET', 'GetMessageFriends', null, UserStore.getters.getUserId(), 1, 100)
+                .then(resp => friends.value.push(resp));
+
+                //console.log(friends.value)
+            }
+        },
         sendMessageToUser(user) {
             this.$emit('sendToUser', user);
             this.newMessageDialog = false;
