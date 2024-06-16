@@ -3,7 +3,7 @@
         <v-row class="py-3">
                 <h2>Messages</h2>
         <v-col cols="3">
-            <div>
+            <div >
                 <v-switch
                     v-model="this.drawer"
                     hide-details
@@ -14,7 +14,7 @@
             </div>
         </v-col>
         <v-col class="text-right">
-            <new-message-dialog  @sendToUser="this.createNewChatRoom"/>
+            <new-message-dialog @sendToUser="this.createNewChatRoom"/>
         </v-col>
         </v-row>
 
@@ -39,22 +39,23 @@
                         </v-row>
                         <!--Left messagerooms panel-->
                         <message-rooms-type1
-                        :chatRooms="chatRooms[0]"
+                        :chatRooms="chatRooms"
+                        @switchRoom="switchRoom"
                         ></message-rooms-type1>
                     </div>
                 </v-col>
             </Transition>
-            <Transition name="slide-in-fade">
+            <!-- <Transition name="slide-in-fade">
                 <v-col v-if="!this.drawer" cols="3">
                     <message-rooms-type2
                     :chatRooms="chatRooms[0]"
                     >
                     </message-rooms-type2>
                 </v-col>
-            </Transition>
+            </Transition> -->
 
             <!--right messagebox area-->
-            <message-contents 
+            <message-contents :content="chatContent"
                 >
             </message-contents>
         </v-col>
@@ -66,37 +67,37 @@ import { ref, onMounted, watch } from 'vue'
 import fetchData from '@/stores/server_routes.js';
 import { formatDate, getFullName } from '@/utils/common'
 import UserStore from '@/stores/UserStore';
-import MessageStore from '@/stores/MessageStore';
+import eventBus from '@/stores/eventBus';
 
-import { createNewChatRoom, doesRoomExist } from '@/utils/MessageHelper.js'
+import { createNewChatRoom } from '@/utils/MessageHelper.js'
 
-import { setStartingChatRoom } from './MessagePage/showMessage'
 import NewMessageDialogComponent from '@/views/Message/MessagePage/NewMessageDialogComponent.vue';
 import LeftMessageRoomsComponent from '@/views/Message/MessagePage/LeftMessageRoomsComponent.vue';
 import LeftMessageRoomsComponentType2 from '@/views/Message/MessagePage/LeftMessageRoomsComponentType2.vue';
 import RightMessageContentsComponent from '@/views/Message/MessagePage/RightMessageContentsComponent.vue';
 
-let chatRooms = ref([]);
-let chatContent = ref([]);
-var partnerId = MessageStore.getters.getPartnerId();
-
-
+let chatRooms = ref();
+let chatContent = ref();
 
 export default {
     setup() {
         onMounted(async () => {
             try {
                 var resp = await fetchData.methods
-                    .fetchData('GET', 'GetAllChatRoom', null, UserStore.state.userId);
-                setStartingChatRoom(resp[0]); //Az első szoba amelyik utoljára aktív volt
-                chatRooms.value.push(resp);
+                    .fetchData('GET', 'GetAllChatRoom', null, UserStore.getters.getUserId());
+
+                chatRooms.value = resp;            
+                chatContent.value = resp[0]; //első szoba lesz az alapértelmezett
+                console.log("response: " + JSON.stringify(chatContent.value))
             }
             catch (error) {
                 console.log(error);
             }
-        })
+        });
     },
-    
+    mounted() {
+        eventBus.on('new-message', this.messageSendCallback);
+    },    
     components: {
         'new-message-dialog': NewMessageDialogComponent,
         'message-rooms-type1': LeftMessageRoomsComponent,
@@ -105,16 +106,14 @@ export default {
     },
     data() {
         return {
-             loaded: false,
-             loading: false,
+            loading: false,
             searchText: '',
             chatRooms,
             chatContent,
-            partnerId,
-            partner: [],
             formatDate, getFullName,
             drawer: true,
-            createNewChatRoom, doesRoomExist
+            createNewChatRoom,
+            showNewMsg: false,
         }
     },
     methods: {
@@ -122,15 +121,39 @@ export default {
             this.loading = true;
             var resp = await fetchData.methods
                 .fetchData('GET', 'GetAllChatRoom', null, UserStore.state.userId, this.searchText);
-            chatRooms.value = [];
-            chatRooms.value.push(resp);
+            chatRooms.value = null;
+            chatRooms.value = resp;
                 
             console.log(resp)
             this.loading = false;
         },
-    }
-}
+        switchRoom(index) {
+            chatContent.value = chatRooms.value[index];
+        },
+        
+        messageSendCallback(message) {
+            //console.log("current user/me: " + UserStore.getters.getUserId());
+            //console.log("message to add chatContents: " + JSON.stringify(message));
+            //console.log("chatRooms : " + JSON.stringify(chatRooms.value[0].key));
+            for (const [key, value] of Object.entries(chatRooms.value)) {
+                if (value.value.userId === message.senderId  || 
+                value.value.userId == message.receiverId || 
+                value.value.userId == message.authorId) {
+                    //console.log("adding message to room: " + key)
+                    this.insertMessage(key, message);
+                }
+            }
+        },
+        insertMessage(index, message) {
+            chatRooms.value[index].key.chatContents.unshift(message)
+        },
 
+    },
+    
+    beforeUnmount() {
+        eventBus.off('new-message', this.messageSendCallback);
+    },
+}
 
 </script>
 
@@ -152,22 +175,6 @@ export default {
     padding-right: 0;
 }
 
-.messaging_area {
-    scroll-snap-type: y proximity;
-    overflow-y: scroll;
-    flex-direction: column;
-    height: 80vh;
-    display: flex;
-}
-
-/*Here can be modified the chat rooms and contents height */
-.scroll_msg_pane {
-    overflow-y: auto;
-    overflow-x: hidden;
-    max-height: 60vh;
-}
-
-
 .audioPopup {
     position: absolute;
     bottom: 15%;
@@ -176,31 +183,11 @@ export default {
     padding-left: 12px;
 }
 
-
-
 .overflowing-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-right: 5px;
-}
-
-/*
-Chrome, Edge, Safari and Opera support the non-standard ::-webkit-scrollbar pseudo element
-*/
-
-.scrollbar::-webkit-scrollbar {
-    width: 12px;
-}
-
-.scrollbar::-webkit-scrollbar-track {
-    background-color: rgba(172, 170, 173, 0.517);
-    border-radius: 5px;
-}
-
-.scrollbar::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 6px rgb(10, 151, 239);
-    border-radius: 3px;
 }
 
 .slide-fade-enter-from, 
