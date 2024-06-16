@@ -14,16 +14,14 @@
                 @click="toggleMenu('text')">
                 mdi-keyboard
             </v-icon>
-            <imageSender />
-            
+            <imageSender @activeMenu="toggleMenu"/>
     </div>
-
     <div v-if="activeMenu=='audio'">
         <AudioRecorder v-if="this.recording" @newAudioCreated="passUrlToChild"/>
         <AudioSender v-else 
+        :userId="userId"
         :url="this.url"
         @recording="toggleRecording"
-        @activeMenu="toggleMenu"
         />
     </div>
     <TextBox v-if="activeMenu=='text'" :userId="userId" :selectedEmoji="selectedEmoji"/>
@@ -36,8 +34,10 @@ import imageSender from './ImageSender.vue';
 import AudioSender from './AudioSender.vue';
 import TextBox from './ChatTextBox.vue'
 
-
 export default {
+    props: {
+        userId: Number
+    },
     components: {
         EmojiPicker: EmojiPickerComponent,
         AudioRecorder,
