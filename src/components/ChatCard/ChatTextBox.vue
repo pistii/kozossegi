@@ -19,15 +19,22 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import eventBus from '@/stores/eventBus';
 import { onSendMessage } from '@/utils/MessageHelper.js';
 import MessageStore from '@/stores/MessageStore.js';
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const props = defineProps(['userId', 'selectedEmoji']);;
 
 const message = ref('');
 const fileInfo = ref(null);
-
 const fileUrl = ref(null);
 const textLabel = ref(null);
 const fileType = ref(null);
-const response = ref(null);
 
+//watcher for emoji change in case of if the emoji was selected from one specific component.
+watch(props, (prop) => {
+    message.value += prop.selectedEmoji;
+}, { deep: true });
+
+//Message sending collaborate here. 
 const sendMessage = async () => {
     //parameters: message, url, mimeType, callback
     response.value = await onSendMessage(message.value, fileUrl.value, fileType.value, notifyBody);

@@ -70,16 +70,6 @@ export default {
             formatText,
         }
     },
-    mounted() {
-        eventBus.on('updateChatRoomContent', this.updateContext)
-
-        // this.truncateText();
-        // window.addEventListener("resize", this.truncateText);
-    },
-    beforeDestroy() {
-        eventBus.off('updateChatRoomContent')
-        //window.removeEventListener("resize", this.truncateText);
-    },
     watch: {
         formatDate() {
             formatDate
@@ -160,4 +150,13 @@ function shouldUpdateTime(newDateTime, currentDateTime) {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/*Here can be modified the chat rooms and contents height */
+.scroll_msg_pane {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+}
+
+
 </style>

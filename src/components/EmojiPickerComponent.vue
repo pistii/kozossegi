@@ -10,7 +10,6 @@
 <script>
 import EmojiPicker from '@/views/Message/MessagePage/EmojiPicker.vue'
 import emojiJsonData from '@/emojis-data.json'
-import eventBus from '@/stores/eventBus';
 
 export default {
     props: {
@@ -38,7 +37,7 @@ export default {
             }
         },
         handleEmojiClick(emoji) {
-            eventBus.emit('selectedEmoji', emoji); //Notify the Card Footer component about the added emoji
+            this.$emit('selectedEmoji', emoji); //Notify the Card Footer component about the added emoji
             var keys = Object.keys(emojiJsonData['Frequently used'])
             var items = Object.entries(emojiJsonData);
             
@@ -55,3 +54,11 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.emoticon {
+    cursor: pointer;
+    right: 0;
+    height: 17px;
+}
+</style>

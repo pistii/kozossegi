@@ -1,6 +1,6 @@
 <template>
     <div class="chat-menu-icon-row"> <!--Ikonok elrendezése-->
-        <EmojiPicker :activeMenu="this.activeMenu"/>
+        <EmojiPicker :activeMenu="this.activeMenu" @selectedEmoji="addSelectedEmoji"/>
             <v-icon
             :class="{ active: this.activeMenu == 'audio'}"
             class="px-6 py-3 mb-2 menu" 
@@ -26,7 +26,7 @@
         @activeMenu="toggleMenu"
         />
     </div>
-    <TextBox v-if="activeMenu=='text'"/>
+    <TextBox v-if="activeMenu=='text'" :userId="userId" :selectedEmoji="selectedEmoji"/>
     
 </template>
 <script>
@@ -51,6 +51,8 @@ export default {
             activeMenu: 'text',
             recording: true,
             url: null,
+
+            selectedEmoji: '',
         }
     },
     methods: {
@@ -63,6 +65,9 @@ export default {
         },
         toggleRecording(value) {
             this.recording = value;
+        },
+        addSelectedEmoji(emoji) {
+            this.selectedEmoji = emoji;
         }
     },
 
