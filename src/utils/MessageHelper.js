@@ -1,16 +1,11 @@
 import MessageStore from '@/stores/MessageStore';
 import fetchData from '@/stores/server_routes.js';
 import { PostImage } from '@/stores/server_routes.js';
-import { blobToFile, blobToBase64, base64ToBlob } from '@/utils/common';
+import { blobToFile, blobToBase64, base64ToBlob } from '@/utils/common.js';
 
 import UserStore from '@/stores/UserStore';
 
 export async function createNewChatRoom(user) {
-    
-    var chatRooms = await fetchData.methods
-        .fetchData('GET', 'GetAllChatRoom', null, UserStore.state.userId);
-    MessageStore.commit('setChatRooms', chatRooms);
-
     console.log(user)
     var chatRoomKey = {
         'receiverId': user.id,
@@ -30,70 +25,70 @@ export async function createNewChatRoom(user) {
         'value': chatRoomValue
     }
     
-    if (!doesRoomExist(chatRooms, chatRoomKey)) {
-        // Ha a szoba még nem létezik, hozzáadjuk
-        MessageStore.commit('setChatRooms', obj);
-    }
     return obj;
 }
 
-//Visszaad egy indexet ha még nem létezik az adott szoba. Ellenőrzi azt is hogy a beszélgetőpartner írt korábban, ebben az esetben ő rendelkezik a senderId-val
-export function doesRoomExist(chatRooms, chatRoomKey) {
-    // Az elem indexének megkeresése, ha a kulcsok megegyeznek
-    if (chatRooms != null) {
-        const index = chatRooms.findIndex(item => 
-            item.key.senderId === chatRoomKey.senderId && 
-            item.key.receiverId === chatRoomKey.receiverId ||
-            item.key.receiverId === chatRoomKey.senderId && //Beszélgetőpartner ellenőrzése
-            item.key.senderId === chatRoomKey.receiverId
-        );
-    // Ha az index -1, az azt jelenti, hogy nincs találat, tehát még nincs ilyen szoba
-    return index !== -1;
-    }
-    return -1;
-}
 
-//Sends a message with the desired text, or it can be an audio
-export async function onSendMessage(message, url = null, callback) {
+export async function onSendMessage(message, partnerId, url = null, mimeType, callback) {
     var userId = UserStore.state.userId;
-    var partnerId = MessageStore.getters.getPartner().id;
 
-    if (!url) { //Most times the url will be empty
-        if (message.length > 0) {
+    //Message sending without file    
+    if (!url) { //Most times the url will be empty, so this will be sent to a different endpoint
+        if (message !== null && message.length > 0) {
+            console.log("üzenetküldés fájl nélkül");
             let sendValue = {
-                "chatContentId": 0,
+                "chatContentId": 1,
                 "chatFile": null,
                 "senderId": userId,
                 "authorId": userId,
                 "receiverId": partnerId,
                 "message": message,
-                "status": 1
+                "status": 1,
             }
-            await fetchData.methods.fetchData('POST', "PostChatMessage", sendValue)
-            .then(callback(sendValue));
+            var resp = await fetchData.methods.fetchData('POST', "PostChatMessage", sendValue);
+            callback(sendValue);
+            return;
         }
     }
-    else {
-        
-        let blobObj = await fetch(url).then(r => r.blob());
-        const base64Data = await blobToBase64(blobObj);
-        const mimeType = "audio/wav";
-        const blob = base64ToBlob(base64Data.split(',')[1], mimeType);
-        const fileBlob = blobToFile(blob, "audioFile.wav", mimeType);
+    
+    //Send message with files
+    var imageTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];
+    var audioType = "audio/wav";
+    let videoTypes = ["video/mp4"];
 
-        const file = new FormData();
-        file.append("senderId", userId);
-        file.append("authorId", userId);
-        file.append("receiverId", partnerId);
-        file.append("message", "w");
-        file.append("status", 1);
+    const file = new FormData();
+    file.append("senderId", userId);
+    file.append("authorId", userId);
+    file.append("receiverId", partnerId);
+    file.append("message", message);
+    file.append("status", 1);
+    
+    if (url && (imageTypes.includes(mimeType) || videoTypes.includes(mimeType))) { 
+        //handle images
+        console.log("image sending....");
+        var blobObj = await fetch(url).then(r => r.blob());
         
-        file.append('chatFile.Name', fileBlob.name); 
-        file.append('chatFile.Type', fileBlob.type); 
-        file.append('chatFile.File', fileBlob); 
+        const fileToSend = await blobToFile(blobObj, "testName", mimeType);
         
-        await PostImage('POST', 'PostFile', file).then(resp => callback(resp));
+        file.append('chatFile.Name', "test name");
+        file.append('chatFile.Type', mimeType); 
+        file.append('chatFile.File', fileToSend); 
     }
+
+    else if (mimeType == audioType){
+        console.log("audio file sending....");
+        let blobObj = await fetch(url).then(r => r.blob());
+        const fileBlob = blobToFile(blobObj, "fileName", mimeType);
+        
+        file.append('chatFile.Name', fileBlob.name);
+        file.append('chatFile.Type', fileBlob.type);
+        file.append('chatFile.File', fileBlob); 
+    }
+
+    await PostImage('POST', 'PostFile', file).then((resp) => { 
+            resp.receiverId = partnerId; 
+            callback(resp);
+        });
 };
 
 //Called to send a message to the selected user
