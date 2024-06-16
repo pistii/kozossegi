@@ -11,8 +11,8 @@
             </v-progress-circular>
         </div>
         <v-sheet 
-        class="messaging_area  scrollbar scroll_msg_pane containerSize" id="container"
-         ref="parent">
+            class="messaging_area  scrollbar scroll_msg_pane containerSize" id="container"
+            ref="parent">
             <div class="pt-1">
             <Observer 
             v-if="!isDataLoading && fetchMessages"
@@ -22,15 +22,15 @@
             <v-container class="containerSize" v-if="noDataFound">
                 <p>Még nincs megjelenítendő beszélgetés...</p>
             </v-container>
-            <div v-else>
+            <div  v-else>
                 <span
-                    v-for="(message, index) in fetchMessages?.chat?.data" 
+                    v-for="(message, index) in fetchMessages" 
                     :key="index">
                     <chat-msg-comp :msg="message" />
                 </span>
             </div>
         </div>
-        </v-sheet>            
+        </v-sheet>
     </v-col>
 </template>
 
@@ -55,6 +55,7 @@ export default {
    },
    setup() {
         const parent = ref(null);
+        const enableObserver = ref(false);
 
         const loadMoreMessage = async () => {
             await MessageStore.dispatch('loadMoreMessage');
@@ -62,9 +63,9 @@ export default {
         const handleIntersection = () => {
             console.log("intersecting");
             prevScrollHeight.value = parent.value.$el.scrollTop;
-                            loadMoreMessage().then(() => {
-                                scrollBack();
-                            });
+            loadMoreMessage().then(() => {
+                scrollBack();
+            });
         };
 
         const scrollBack = () => {
@@ -72,35 +73,19 @@ export default {
                 parent.value.$el.scrollTop = prevScrollHeight.value; 
             
         };
-
+        
         return { 
             handleIntersection, 
             parent, 
             enableObserver,
         }
    },
-   watch: {
-        getChatContents: {
-            deep: true,
-            handler () {
-                //this.updateContent();
-                this.stayBottom();
-            }
-        },
-   },
    computed: {
-        getChatContents() {
-            return MessageStore.getters.getActiveChat();
-        },
-        showObserver() {
-            return enableObserver;
-        },
         isDataLoading() {
             return MessageStore.getters.getLoadingState();
         },
         fetchMessages() {
-            chatContents.value = MessageStore.getters.getActiveChat();
-            return MessageStore.getters.getActiveChat();
+            return MessageStore.getters.getActiveChat()?.chat?.data;
         },
         noDataFound() {
             return !MessageStore.getters.getActiveChat()?.chat?.data && !MessageStore.getters.getLoadingState();
@@ -108,10 +93,7 @@ export default {
     },
     data() {
         return {
-           loadMoreMessage_Progress : false,
-
             chatContents,
-            enableObserver,
         }
     },
     methods: {
@@ -123,7 +105,7 @@ export default {
                     container.$el.scrollTo({ top: scrollHeight });
                 }
             }
-        },
+        },        
     },
     beforeUnmount() {
         eventBus.off('update-scrollHeight', this.scrollToBottom());
@@ -135,6 +117,8 @@ export default {
 <style scoped>
 .messaging_area {
     background-color: rgba(0, 128, 0, 0.133);
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 .scroll_msg_pane {
@@ -145,7 +129,6 @@ export default {
 .containerSize {
     height: 300px;
     max-height: 350px;
-    max-height: 30vh;
 }
 
 .overlayLoading {
