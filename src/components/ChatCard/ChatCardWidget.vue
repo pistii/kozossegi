@@ -7,7 +7,7 @@
         <v-row >
             <ChatCardWidgetBody style="max-width: 324px;" />
         </v-row>  
-        <ChatCardWidgetFooter/>
+        <ChatCardWidgetFooter :userId="activeUser?.user?.id"/>
     </div>
 </template>
 
@@ -15,17 +15,23 @@
 import ChatCardWidgetHeader from './ChatCardWidgetHeader.vue';
 import ChatCardWidgetBody from './ChatCardWidgetBody.vue';
 import ChatCardWidgetFooter from './ChatCardWidgetFooter.vue';
+import MessageStore from '@/stores/MessageStore.js';
 
 export default {
     data() {
         return {
             containerHeight : 420,
         }
-    },    
+    },
     components: {
         ChatCardWidgetHeader,
         ChatCardWidgetBody,
         ChatCardWidgetFooter,
+    },
+    computed: {
+        activeUser() {
+            return MessageStore.getters.getActiveChat();
+        },
     },
     methods: {
         setChatContainerHeight(size) {
