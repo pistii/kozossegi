@@ -3,7 +3,7 @@ import moment from 'moment'
 export function formatDate(date) {
     const today = new Date();
     let passedTime = today.getDate() - moment(date).date();
-    if (passedTime < 1) { //Ha több mint egy nap telt el
+    if (passedTime > 1) { //Ha több mint egy nap telt el
         return moment(date).format("YYYY.MM.DD")
     }
     else {
@@ -106,10 +106,7 @@ export function blobToFile(blob, fileName, type) {
 }
 
 export function fileToBlob(file) {
-    // Fájl adatok dekódolása
-    const byteArray = new Uint8Array(file.length);
-
-    const blob = new Blob([byteArray], { type: 'audio/wav' });
+    const blob = new Blob([file], { type: file.fileType });
     const url = URL.createObjectURL(blob);
-    return url.src;
+    return url;
 }
