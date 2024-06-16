@@ -2,12 +2,12 @@
     <div
         :class="{ 'ma-2 pa-3 d-flex bg-green rounded wrapContent' : msg.authorId === userId}"
         class="ma-2 pa-3 d-flex bg-blue rounded wrapContent" 
+        style="height: 150px;"
         @click="showImage()">
-        <v-img    
+        <v-img  
             :width="300"
             :src="url"/>
     </div>
-    <!-- {{ console.log(msg.chatFile) }} -->
     <v-dialog 
         v-model="expandImage"
         max-width="1200"
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import fetchData from '@/stores/server_routes';
 
 export default {
     props: {
@@ -38,19 +39,26 @@ export default {
         return {
             expandImage: false,
             url: null,
+            
         }
     },
     mounted() {
         this.createImage();
     },
     methods: {
-        createImage() {
-            var image = new Image();
+        async createImage() {
+            let image = new Image();
             if (this.msg.chatFile.local) {
                 image.src = this.msg.chatFile.fileToken
             }
             else {
-                image.src = `data:${this.msg.chatFile.fileType};base64,${this.msg.chatFile.fileData}`;
+                if (!this.msg.chatFile.fileData) {
+                    let file = await this.getFile(this.msg.chatFile.fileToken);
+                    image.src = `data:${this.msg.chatFile.fileType};base64,${file}`;
+                }
+                else {
+                    image.src = `data:${this.msg.chatFile.fileType};base64,${this.msg.chatFile.fileData}`;
+                }
             }
             this.url = image.src;
             this.updateBody();
@@ -61,7 +69,11 @@ export default {
         },
         showImage() {
             this.expandImage = true;
-        }
+        },
+        async getFile(token) {
+            let file = await fetchData.methods.fetchData('GET', 'GetFile', null, token);
+            return file;
+        },
     }
 }
 </script>
