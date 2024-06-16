@@ -1,10 +1,13 @@
 <template>
     <v-text-field
         class=" bg-blue-lighten-4" 
+        maxLength="800"
         placeholder="Say something..."
+        v-model="message" 
         :label="textLabel"
         append-inner-icon="mdi-send-circle" 
-        v-model="message" 
+        :append-icon="textLabel ? 'mdi-delete-circle' : undefined"
+        @click:append="removeFile"
         @click:append-inner="sendMessage"
         v-on:keyup.enter="sendMessage">
         <template v-slot:prepend-inner>
@@ -14,8 +17,7 @@
 </template>
 
 <script setup>
-
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import eventBus from '@/stores/eventBus';
 import { onSendMessage } from '@/utils/MessageHelper.js';
 import MessageStore from '@/stores/MessageStore.js';
@@ -36,49 +38,70 @@ watch(props, (prop) => {
 
 //Message sending collaborate here. 
 const sendMessage = async () => {
-    //parameters: message, url, mimeType, callback
-    response.value = await onSendMessage(message.value, fileUrl.value, fileType.value, notifyBody);
+    if (message.value || fileUrl.value) 
+        await onSendMessage(message.value, props.userId, fileUrl.value, fileType.value, notifyOverlayBody);
+};
+
+const removeFile = () => {
+    URL.revokeObjectURL(fileUrl.value);
+    textLabel.value = null;
+    fileUrl.value = null;
+    fileType.value = null;
+    fileInfo.value = null;
 }
 
-const notifyBody = (resp) => {
+//Audio sending is not implemented here, instead in audioSender
+const notifyOverlayBody = (resp) => {
+    const currentPath = router.currentRoute.value.name;
+    console.log("file sending callback");
+    
     if (fileInfo.value !== null) { 
         const chatFile = {
-            'FileType': fileInfo.value.fileType,
-            'FileToken': fileInfo.value.url,
+            'fileType': fileInfo.value.fileType,
+            'fileToken': fileInfo.value.url,
             'local': true
         }
-        var combinedData = Object.assign({}, resp, { chatFile: chatFile });
-        MessageStore.commit('addItemToChat', combinedData);
+        const receiverId = props.userId;
+        const respWReceiverId = Object.assign({}, resp, {receiverId});
+        var combinedData = Object.assign({}, respWReceiverId, { chatFile });
+        MessageStore.dispatch('insertMessage', combinedData);//Notify the overlays
+        console.log("current path: " + currentPath);
+        if (currentPath === 'message') {
+            console.log("notify mv" + JSON.stringify(combinedData));
+            eventBus.emit('new-message', combinedData); //notify to add data to view
+        }        
     }
     else {
-        MessageStore.commit('addItemToChat', resp);
+        console.log("response from server: " + JSON.stringify(resp));
+        MessageStore.dispatch('insertMessage', resp); //Notify the overlays
+
+        if (currentPath === 'message') {
+            eventBus.emit('new-message', resp); //notify to add data to view
+        }
     } 
     //Set to default
     textLabel.value = null;
     message.value = '';
     fileUrl.value = null;
-}
-
-const addEmoji = (emoji) => {
-    message.value += emoji;
-}
+    fileInfo.value = null;
+};
 
 //Sets the containsImage to the image Url if image was selected to send
 const addImage = (fileData) => {
+    //console.log(fileData);
     fileInfo.value = fileData;
 
     fileUrl.value = fileData.url;
     textLabel.value = fileData.fileName;
     fileType.value = fileData.fileType;
-}
+};
 
 onMounted(() => {
-    eventBus.on('selectedEmoji', addEmoji); //Subscribe to the emoji picker component
     eventBus.on('chat-image-send', addImage);
-})
+});
 
 onUnmounted(() => {
-    eventBus.off('selectedEmoji', addEmoji);
     eventBus.off('chat-image-send', addImage);
-})
+
+});
 </script>
