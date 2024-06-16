@@ -16,6 +16,7 @@ const store = createStore({
       GetChatContent: 'api/chat/',
       PostChatMessage: 'api/chat/newChat/',
       PostFile: 'api/chat/file/',
+      GetFile: 'api/chat/file/token/',
       //Posts
       CreateNewPost: 'api/post/createNew/',
       GetAllPost: "api/post/GetAllPost/",
