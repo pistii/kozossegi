@@ -3,10 +3,10 @@
         <div class="scroll_msg_pane scrollbar py-3"
         >
             <div v-if="chatRooms != null"
-                v-for="(room, index) in Object.entries(chatRooms)">
-                <v-row v-if="room[1].key.chatContents && 
-                    room[1].key.chatContents.length > 0"
-                    :class="room[1].key.chatContents[0].status === 1
+                v-for="(room, index) in chatRooms">
+                <v-row v-if="room.key.chatContents && 
+                    room.key.chatContents.length > 0"
+                    :class="room.key.chatContents[0].status === 1
                     ? 'bg-blue-darken-3 py-5' : 'pb-5'" >
                     <v-hover>
                         <template v-slot:default="{ isHovering, props }">
@@ -16,31 +16,31 @@
                             :color="isHovering ? 'primary' : undefined" 
                             v-bind="props" 
                             width="100%"
-                            @click="showMessage(room[1].key.chatRoomId, room[1].value)"
+                            @click="switchRoom(index)"
                             >
                             <v-sheet class="elevation-3 bg-transparent">
                                 <v-col class="profile_pic_container">
                                     <div>
                                         <v-avatar>
                                         <v-img class="profile_pic"
-                                            :src="room[1].value.avatar ?? '/src/assets/imgs/blank_profile_pic.png'" />
+                                            :src="getUserAvatar(room.value.avatar)" />
                                         </v-avatar>
-                                        {{ getFullName(room[1].value.firstName, room[1].value.middleName, room[1].value.lastName) }}
+                                        {{ getFullName(room.value.firstName, room.value.middleName, room.value.lastName) }}
                                     </div>
                                 </v-col>
                                 <v-col>
                                     <v-row class=" pa-3">
                                         <span v-if="room.key.chatContents.length>0"  class="text-container">
                                             <span >
-                                                {{ formatText(room.key.chatContents[room.key.chatContents.length -1]) }}
+                                                {{ formatText(room.key.chatContents[0]) }}
                                             </span>
                                         </span>
-                                        <span v-else></span> 
+                                        <span v-else></span>
                                     </v-row>
                                 </v-col>
                             </v-sheet>
                                 <v-col class="message_time pa-2">
-                                    {{ formatDate(room[1].key.endedDateTime) }}
+                                    {{ formatDate(room.key.endedDateTime) }}
                                 </v-col>
                             </v-card>
                             <v-divider></v-divider>
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { getFullName, formatDate } from '@/utils/common';
+import { getFullName, formatDate, getUserAvatar } from '@/utils/common';
 import { showMessage } from './showMessage';
 import eventBus from '@/stores/eventBus';
 import MessageStore from '@/stores/MessageStore';
@@ -62,10 +62,18 @@ export default {
     props: {
         chatRooms: Object,
     },
+    
+    mounted() {
+        eventBus.on('updateChatRoomContent', this.updateContext);
+        
+    },
+
     data() {
         return {
             getFullName,
             formatDate,
+            getUserAvatar,
+
             showMessage,
             formatText,
         }
@@ -117,15 +125,25 @@ export default {
 
                 this.truncatedText = truncatedText;
             }
+        },
+        switchRoom(index) {
+            //MessageStore.dispatch("addUser", this.chatRooms[index].value);
+            this.$emit('switchRoom', index);
+            var userId = this.chatRooms[index].value.userId;
+            eventBus.emit('userId-to-sendMsg-msgView', userId);
         }
-    }
+    },
+    
+    beforeDestroy() {
+        eventBus.off('updateChatRoomContent');
+    },
 }
 
-function formatText(message) {
+function formatText(chatObj) {
     const n = 30;
-    if (message)
-        if (message.chatFile) return "Üzenet csatolmánnyal.";
-        else return (text.length > n) ? text.slice(0, n-1) + '&#8230;' : text;
+    if (chatObj)
+        if (chatObj.chatFile) return "Üzenet csatolmánnyal.";
+        else return (chatObj.message.length > n) ? chatObj.message.slice(0, n-1) + '&#8230;' : chatObj.message;
     else return 'Üzenet csatolmánnyal.'
 }
 
