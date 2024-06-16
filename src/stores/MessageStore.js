@@ -1,6 +1,7 @@
 import { createStore } from 'vuex';
 import fetchData from '@/stores/server_routes';
 import UserStore from './UserStore';
+import eventBus from '@/stores/eventBus.js';
 
 export default createStore({
   state: {
@@ -43,28 +44,35 @@ export default createStore({
         roomid: 59
       };
     */
+   
   },
   mutations: {
     setFrequentlyUsedEmojis(state, emoji) {
       state.emojis = emoji;
     },
+    //for overlay:
     setActiveChat(state, chatContents) {
       state.activeChat = chatContents;
     },
     addItemToChat(state, message) {
-      console.log(state.activeChat);
-      state.activeChat.data.push(message);
+      console.log(state.userChatHeads[0].chat.data);
+      
+      state.userChatHeads[0].chat.data.push(message);
     },
     showLoader(state, show) {
       state.loading = show;
-    }
+    },
+
   },
   getters: {
     getFrequentlyUsedEmojis: (state) => {
       return state.emojis;
     },
+    //Overlay getters:
     getActiveChat: (state) => () => {
-      return state.userChatHeads[0]; //First item is the activeChat the other ones the chatHeads.
+      if (state.userChatHeads[0] !== undefined){
+        return state.userChatHeads[0]; //First item is the activeChat the other ones the chatHeads.
+      }
     },
     getChatHeads: (state) => () => {
       return state.userChatHeads.slice(1); 
@@ -93,14 +101,23 @@ export default createStore({
       this.state.userChatHeads.unshift(chatRoomToSetActive);
     },
 
-
+    insertMessage({commit}, message) { //inserts a message to the belonging chat if user writes from messageView
+      if (this.state.userChatHeads.length > 0) {
+        for (const item of this.state.userChatHeads) {
+          //console.log(message);
+          if (item.user.id == message.senderId || item.user.id == message.receiverId) {
+            item.chat.data.push(message);
+            console.log("data added to store: " + JSON.stringify(message));
+          }
+        }
+      }
+    },
     //adds user to userChatHeads if it doesn't contains the user
     async addUser({commit}, user) {
       this.state.loading = true;
       const MAX_CHAT_HEADS  = 7;
 
       var contents = await this.dispatch('fetchMessages', user);
-      //console.log("content: " + JSON.stringify(contents));
       var chat = {
         'user': user,
         'chat': contents
@@ -127,23 +144,26 @@ export default createStore({
       }
     },
 
-    async loadMoreMessage({commit}, chat) {
-      //console.log("load more msg......");
-      var roomId = chat.roomId;
-      var cp = chat.currentPage;
-      var totalPage = chat.totalPages;
-      if (totalPage >= cp) {
-        chat.currentPage++;
-        //console.log("totalPage: " + totalPage + "cp: " + cp + " | roomid:" + chat.roomId);
-        
-        var response = await fetchData.methods
-        .fetchData('GET', 'GetChatContent', null, roomId, cp);
-        
-        //console.log(response.data);
-        this.state.userChatHeads.find(p => p.chat?.roomId === roomId).chat?.data.unshift(...response.data);
-        //chatRoomToUpdate.chat.data.unshift(...response.data);
-        console.log("contents in mssg: " + this.state.userChatHeads.chat);
-        return response; //Return the messages
+    async loadMoreMessage({commit}) {
+      this.commit('showLoader', true);
+      console.log("load more msg......");
+      if (this.state.userChatHeads[0]) {
+        var chat = this.state.userChatHeads[0].chat;
+        var roomId = chat.roomId;
+        var cp = chat.currentPage;
+        var totalPage = chat.totalPages;
+        if (totalPage >= cp) {
+          chat.currentPage++;
+          //console.log("totalPage: " + totalPage + "cp: " + cp + " | roomid:" + chat.roomId);
+          
+          var response = await fetchData.methods
+          .fetchData('GET', 'GetChatContent', null, roomId, cp);
+          
+          this.state.userChatHeads.find(p => p.chat?.roomId === roomId).chat?.data.unshift(...response.data);
+          this.commit('showLoader', false);
+          this.state.loading = false;
+          return response;
+        }
       }
     },
   }
