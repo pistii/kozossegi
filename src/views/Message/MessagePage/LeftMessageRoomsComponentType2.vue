@@ -27,7 +27,6 @@
 <script>
 //import MessageStore from '../../stores/MessageStore';
 import { getFullName } from '@/utils/common';
-import { showMessage } from './showMessage';
 
 export default {
     props: {
@@ -36,11 +35,15 @@ export default {
     data() {
         return {
             getFullName,
-            showMessage,
         }
     },
     setup() {
         //MessageStore.commit('setCurrentRoomId', )
+    },
+    methods: {
+        showMessage(roomId, content) {
+            
+        }
     }
 }
 </script>

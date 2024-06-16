@@ -54,7 +54,6 @@
 
 <script>
 import { getFullName, formatDate, getUserAvatar } from '@/utils/common';
-import { showMessage } from './showMessage';
 import eventBus from '@/stores/eventBus';
 import MessageStore from '@/stores/MessageStore';
 
@@ -74,7 +73,6 @@ export default {
             formatDate,
             getUserAvatar,
 
-            showMessage,
             formatText,
         }
     },
