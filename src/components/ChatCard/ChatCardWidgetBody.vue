@@ -13,8 +13,10 @@
         <v-sheet 
         class="messaging_area  scrollbar scroll_msg_pane containerSize" id="container"
          ref="parent">
-            <div>
-            <Observer @intersect="handleIntersection" 
+            <div class="pt-1">
+            <Observer 
+            v-if="!isDataLoading && fetchMessages"
+            @intersect="handleIntersection" 
             :options="{ threshold: 0.3 }" />
 
             <v-container class="containerSize" v-if="noDataFound">
@@ -40,9 +42,8 @@ import eventBus from '@/stores/eventBus';
 import ChatMessageComponent from '@/views/Message/MessagePage/ChatMessageComponent.vue'
 import Observer from '@/components/Observer.vue'
 
-
 const chatContents = ref([]);
-const enableObserver = ref(false);
+var prevScrollHeight = ref(null);
 
 export default {
     components: {
@@ -52,65 +53,30 @@ export default {
     mounted() {
         eventBus.on('update-scrollHeight', this.stayBottom);
    },
-   
    setup() {
         const parent = ref(null);
 
         const loadMoreMessage = async () => {
-            await MessageStore.dispatch('loadMoreMessage', chatContents.value.chat);
+            await MessageStore.dispatch('loadMoreMessage');
         }
-        const base64ToImage = (data) => {
-            var imageTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];
-            if (data === undefined) return;
-
-            var dataObj = Object.entries(data);
-            for (const iterator of dataObj[2]) {
-                //console.log(iterator)
-                for (const chatContents of iterator) {
-                    if (chatContents.chatFile !== null && chatContents.chatFile !== undefined) {
-                        //console.log(chatContents.chatFile);
-                        if (imageTypes.includes(chatContents.chatFile.fileType)) {
-                            var binaryData = [];
-                            binaryData.push(chatContents.chatFile.fileData);
-                            var blobObj = new Blob([binaryData], {type: chatContents.chatFile.fileType});
-                            var url = URL.createObjectURL(blobObj);
-                            chatContents.chatFile.fileData = url;
-                            console.log(chatContents.chatFile.fileData);
-                        }
-                    }
-                }
-            }
-        };
         const handleIntersection = () => {
-            if (chatContents.value !== undefined) {
-                var totalPages = chatContents?.value.chat?.totalPages;
-                var cp = chatContents?.value.chat?.currentPage;
-                if (totalPages >= cp) {
-                    if (chatContents.value.chat.data.length !== 0) {
-                        setTimeout(() => {
-                            MessageStore.commit('showLoader', true);
+            console.log("intersecting");
+            prevScrollHeight.value = parent.value.$el.scrollTop;
                             loadMoreMessage().then(() => {
-                                MessageStore.commit('showLoader', false);  
                                 scrollBack();
-                        
                             });
-                        }, 100);
-                    }
-                }
-            }
         };
 
         const scrollBack = () => {
-            if (parent.value.$el) {
-                //scrollTop
-                parent.value.$el.scrollTop = parent.value.$el.scrollTop + 400; 
-            }
+            if (parent.value.$el)
+                parent.value.$el.scrollTop = prevScrollHeight.value; 
+            
         };
 
         return { 
             handleIntersection, 
             parent, 
-            base64ToImage,
+            enableObserver,
         }
    },
    watch: {
@@ -158,22 +124,10 @@ export default {
                 }
             }
         },
-
-        stayBottom() {
-            nextTick(() => {
-                this.scrollToBottom();
-            });
-        },
-
-        updateContent() {
-            this.stayBottom();
-        },
-        
     },
     beforeUnmount() {
         eventBus.off('update-scrollHeight', this.scrollToBottom());
-
-    },
+    }
 }
 
 </script>
