@@ -33,9 +33,12 @@
 import { onSendMessage } from '@/utils/MessageHelper.js';
 import audioVisualizer from '@/components/audioVisualizer.vue';
 import MessageStore from '@/stores/MessageStore';
+import eventBus from '@/stores/eventBus.js';
+
 
 export default {
     props: {
+        userId: Number,
         url: String
     },
     components: {
@@ -50,28 +53,43 @@ export default {
         deleteAudio() {
             this.delete = true;
             this.url = null;
-            this.notifyParentAboutRecording(true);
+            this.notifyParentAboutRecording();
         },
         async send() {
-            //message, url, mimeType, callback
-            await onSendMessage(null, this.url, "audio/wav", this.onFileSend);
+            //message, partner, url, mimeType, callback
+            await onSendMessage(null, this.userId, this.url, "audio/wav", this.onFileSend);
         },
         onFileSend(response) {
+            const currentPath = this.$route.name;
             var data = response;
             var chatFile = {
                 'fileToken': this.url,
                 'fileType': 'audio/wav',
                 'local': true,
             }
-            var combinedData = Object.assign({}, data, { chatFile: chatFile });
-            MessageStore.commit('addItemToChat', combinedData);
-            this.notifyParentAboutRecording(true);
+            var combinedData = Object.assign({}, data, { chatFile });
+            let activeChat = MessageStore.getters.getActiveChat();
+            if (activeChat !== undefined && currentPath == 'message') { //if there is open chat AND currentPath is MV
+                if (MessageStore.getters.getActiveChat().user.id === this.userId) {
+                    MessageStore.commit('addItemToChat', combinedData);
+                }
+                eventBus.emit('new-message', combinedData);
+            }
+            else if (activeChat !== undefined) //If there is open chat
+            {
+                if (MessageStore.getters.getActiveChat().user.id === this.userId) {
+                    MessageStore.commit('addItemToChat', combinedData);
+                }
+            } else if (currentPath == 'message') { //add data to MessageView
+                eventBus.emit('new-message', combinedData);
+            }
+            this.notifyParentAboutRecording();
         },
         handleFileChange(event) {
             this.selectedFile = event.target.files[0];
         },
-        notifyParentAboutRecording(value) {
-            this.$emit('recording', value);
+        notifyParentAboutRecording() {
+            this.$emit('recording', true);
         }
     },
     
