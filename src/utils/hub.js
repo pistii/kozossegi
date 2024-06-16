@@ -1,9 +1,11 @@
 import * as signalR from '@microsoft/signalr'
 import store from '../stores/UserStore';
-import MessageStore from '../stores/MessageStore'
+import MessageStore from '@/stores/MessageStore.js';
 import eventBus from '../stores/eventBus';
 import { isLoggedin } from './auth';
 import { compareArrays } from './common';
+import { base64ToBlob, blobToUrl, fileToBlob } from '@/utils/common.js';
+import fetchData from '@/stores/server_routes.js';
 
 var chatConnection;
 var notificationConnection;
@@ -26,11 +28,10 @@ async function SetupNotificationConnection(callback) {
         transport: signalR.HttpTransportType.WebSockets,
         accessTokenFactory: () => { return store.state.auth_token }
     })
-    .configureLogging(signalR.LogLevel.Information) //TODO
+    .configureLogging(signalR.LogLevel.Information) 
     //.withAutomaticReconnect([0, 0, 10000])
     .build();
 }
-
 
 export async function WatchChat(callback) {
     return new Promise(async (resolve) => {
@@ -41,23 +42,34 @@ export async function WatchChat(callback) {
             }
         }
 
-        chatConnection.on("ReceiveMessage", async function (fromId, userId, message) {
-            // console.log("üzenet tőle: " + fromId,
-            //   "üzenetet szövege: " + message +
-            //   "\n userId connection: " + userId
-            // );
+        chatConnection.on("ReceiveMessage", async function (fromId, userId, message, file) {
+            console.log("üzenet tőle: " + fromId,
+              "üzenetet szövege: " + message +
+              "\n userId connection: " + userId
+            );
             
             let data = {
                 "senderId": fromId,
                 "authorId": fromId,
                 "receiverId": store.state.userId,
                 "message": message,
-                "status": 1
+                "status": 1,
             };
 
-            MessageStore.commit('sendNewMessage', data); //Storeban való tároláshoz
-            eventBus.emit('new-message', data); //Értesíti a staybottom metódust hogy frissüljön a csetben
+            if (file) {
+                let chatFile = {
+                    fileToken: file.name,
+                    fileType: file.type
+                };
 
+                var combinedData = Object.assign({}, data, {chatFile});
+                eventBus.emit('new-message', combinedData); //notify messageView
+                MessageStore.dispatch('insertMessage', combinedData);//Notify the overlays to add message
+            }
+            else {
+                eventBus.emit('new-message', data); //notify messageView
+                MessageStore.dispatch('insertMessage', data);//Notify the overlays to add message
+            }
             //Adds the user id if receives a new message and doesn't contains the id. This will trigger the new message received badge on the navBar 
             if (!store.getters.hubContainsId(fromId)) {
                 store.commit('addSenderIdToMessageHub', fromId);
@@ -71,9 +83,10 @@ export async function WatchChat(callback) {
             //console.log(isLoggedin())
             if (isLoggedin()) {
                 console.log("starting connection....")
-
+                
                 // Eseményfigyelő az online barátok listájának fogadására
                 chatConnection.on("ReceiveOnlineFriends", (onlineFriends) => {
+                    console.log(onlineFriends)
                     //Elég csak akkor frissíteni a tárolót ha különbözőek az értékek, így nem lesz újra renderelve az online barátok tömb
                     if (!compareArrays(onlineFriends, store.state.onlineFriends)) {
                         console.log("Online barátok érkeztek:", onlineFriends);
@@ -91,7 +104,7 @@ async function GetOnlineUser() {
     if (chatConnection) {
         var userId = store.state.userId;
         try {
-            console.log("Querying online friends....")
+            //console.log("Querying online friends....")
             await chatConnection.invoke("ReceiveOnlineFriends", userId);
 
         } catch (error) {
