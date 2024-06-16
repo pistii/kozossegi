@@ -334,7 +334,7 @@ export default {
           if (this.phoneNumber.length > 0 && !/^(^\+[36]{2}|[30]{2}|[70]{2})([0-9]{9}$)$/.test(this.phoneNumber) ) { //Előhívószám alapján is lehet validálni a későbbiek során: https://www.digitalis.hu/tudasbazis/hlp_00003.php
               this.errors.push("Telefonszám nem megfelelő.");
           }
-          if (this.EmailAddress == this.SecondaryEmailAddress) {
+          if (this.EmailAddress == this.SecondaryEmailAddress && this.EmailAddress !== '') {
               this.errors.push("A biztonsági és a jelenlegi email cím nem egyezhet.");
           }
           if (this.EmailAddress.length > 0 && !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(this.EmailAddress)) {
