@@ -21,9 +21,9 @@
                             <v-list-item-title style="font-size: 14px">
                                 {{ getFullName(item.firstName, item.middleName, item.lastName) }}
                             </v-list-item-title>
-                            
+
                             <template v-slot:append>
-                                <v-icon icon="mdi-circle-medium" :color="item.isOnline ? 'success' : 'red'"></v-icon>
+                                <v-icon icon="mdi-circle-medium" :color="userIsOnline(item) ? 'success' : 'red'"></v-icon>
                             </template>
                         </v-list-item>
                     </template>
@@ -175,7 +175,22 @@ export default {
         },
         shouldShowOverlayOnlineFriendMessagePanel(expand) {
             UserStore.commit('setOverlayMessageFriendsPanelTo', expand);
-        }
+        },
+        userIsOnline(user) {
+            let userObj = JSON.stringify(user);
+            if (onlineFriends) 
+            {
+                var isOnline = onlineFriends.value.find(p => p.id == user.id); 
+                if (isOnline) {
+                    console.log("onlinefriends: " + JSON.stringify(onlineFriends.value));
+
+                        return true;
+                    
+                }
+                return false;
+            }
+            return false;
+        },  
     }
 }
 </script>
