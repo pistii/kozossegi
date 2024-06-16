@@ -19,13 +19,19 @@ import { fileToBlob } from '@/utils/common.js';
 /*
 v-file-input set to display: none, and the v-icon triggers the functions of the v-file-input
 */
+const imageTypes = ["image/png", "image/jpeg", "image/gif", "image/bmp"];
+const videoTypes = ["video/mp4"];
+const acceptedTypes = [...imageTypes, ...videoTypes];
 export default {
     data() {
         return {
             selectedFile: null,
-            acceptedTypes: ["image/png", "image/jpeg", "image/gif", "image/bmp"]
+            imageTypes,
+            videoTypes,
+            acceptedTypes,
         }
     },
+    emits: ['activeMenu'],
     methods: {
         validateImage() {
             return new Promise((resolve, reject) => {
@@ -43,28 +49,28 @@ export default {
                     reject("Not allowed file type.");
                 }
                 else {
-                    resolve("valid");
+                    resolve(true);
                 }
             });
         },
         triggerFileInput() {
+            this.$emit('activeMenu', 'text');
             this.$refs.fileInput.$el.querySelector('input[type="file"]').click();
         },
 
         async handleFileChange(file) {
             this.selectedFile = file.target.files[0];
             var fileIsValid = await this.validateImage();
-            if (fileIsValid === 'valid') {
+            if (fileIsValid) {
                 var fileBlob = await fileToBlob(this.selectedFile);
                 var fileData = {
                     'url': fileBlob,
                     'fileName': this.selectedFile.name,
                     'fileType': this.selectedFile.type
                 };
-                console.log("url read: " + fileBlob);
+
                 //Notify the ChatTextBox about the new added file
                 this.$emitter.emit('chat-image-send', fileData);
-
             }
         }
     },
